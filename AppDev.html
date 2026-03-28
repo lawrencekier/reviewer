@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APP_DEV: 100-Item IT Modules Quiz Reviewer</title>
+    <style>
+        :root { --primary: #2563eb; --success: #22c55e; --error: #ef4444; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 800px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h1, h2 { text-align: center; color: var(--primary); }
+        .hidden { display: none !important; }
+        .menu-grid { display: grid; gap: 15px; margin-top: 20px; }
+        button { padding: 12px 20px; font-size: 16px; cursor: pointer; border: none; border-radius: 6px; transition: all 0.2s; background: var(--primary); color: white; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .option-btn { display: block; width: 100%; text-align: left; background: #f1f5f9; color: var(--text); margin-bottom: 10px; }
+        .option-btn.correct { background: var(--success) !important; color: white; }
+        .option-btn.wrong { background: var(--error) !important; color: white; }
+        .nav-controls { display: flex; justify-content: space-between; margin-top: 20px; gap: 15px; }
+        .stats { font-weight: bold; margin-bottom: 20px; text-align: center; color: #64748b;}
+        #feedback { margin: 15px 0; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; }
+        .progress-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+
+        /* --- Mobile Responsiveness Adjustments --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px 15px;
+                border-radius: 8px;
+            }
+
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.25rem; }
+
+            button {
+                padding: 14px 15px; /* Taller touch targets for mobile */
+                font-size: 15px;
+                width: 100%; /* Full width buttons on mobile */
+            }
+
+            .stats {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                font-size: 0.95rem;
+                margin-bottom: 15px;
+            }
+
+            #question-text {
+                font-size: 1.1rem !important; /* Scale down question text slightly */
+                margin-bottom: 15px !important;
+            }
+
+            .nav-controls {
+                flex-direction: column-reverse; /* Puts "Next" button on top for easier tapping */
+            }
+            
+            .score-display {
+                font-size: 2rem !important; /* Scale down final score display */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="menu-screen">
+        <h1>CC326: App Development  100-Item Reviewer</h1>
+       <p class="subtitle">Select a module to begin (25 Questions each)</p>
+        <div class="menu-grid">
+            <button onclick="startQuiz(0)">Module 1: Software & Lehman's Laws (25 Items)</button>
+            <button onclick="startQuiz(1)">Module 2: Emerging Technologies (25 Items)</button>
+            <button onclick="startQuiz(2)">Module 4: Cross-Platform Development (25 Items)</button>
+            <button onclick="startQuiz(3)">Topic 2: SDLC & System Analysis (25 Items)</button>
+        </div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <h2 id="module-title">Module Title</h2>
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <div class="stats">
+            <span>Question <span id="q-current">1</span> of <span id="q-total">25</span></span>
+            <span>Current Score: <span id="running-score">0</span></span>
+        </div>
+        <div id="question-text" style="font-size: 1.2em; margin-bottom: 20px; font-weight: 600;"></div>
+        <div id="options-container"></div>
+        <div id="feedback" class="hidden"></div>
+        <div class="nav-controls">
+            <button onclick="showMenu()" style="background: #64748b;">Exit to Menu</button>
+            <button id="next-btn" class="hidden" onclick="nextQuestion()">Next Question ➔</button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2>Module Complete!</h2>
+        <div class="score-display" style="font-size: 2.5em; text-align: center; margin: 20px 0; color: var(--primary); font-weight: bold;">
+            <span id="final-score">0</span> / <span id="max-score">25</span>
+        </div>
+        <p id="result-message" style="text-align: center; font-size: 1.2em; margin-bottom: 30px;"></p>
+        <div class="menu-grid">
+            <button onclick="retryQuiz()">Retry Module</button>
+            <button onclick="showMenu()" style="background: #64748b;">Back to Main Menu</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 100-Item Question Bank
+    const quizData = [
+        {
+            title: "Module 1: Types of Software & Lehman's Laws",
+            questions: [
+                { q: "Which type of software manages hardware and provides a platform for other apps?", a: "System Software", options: ["Application Software", "System Software", "Programming Software", "Utility Software"] },
+                { q: "Which of Lehman's Laws states that software must change or become progressively less useful?", a: "Law of Continuing Change", options: ["Law of Increasing Complexity", "Law of Continuing Growth", "Law of Continuing Change", "Law of Declining Quality"] },
+                { q: "What acts as the 'translator' between the OS and hardware devices?", a: "Device Drivers", options: ["Compilers", "IDEs", "Device Drivers", "Browsers"] },
+                { q: "According to Lehman, why does software quality appear to decline over time?", a: "Lack of rigorous maintenance and adaptation", options: ["Hardware becomes too fast", "Lack of rigorous maintenance and adaptation", "Too many users", "Increasing internet speeds"] },
+                { q: "Which of the following is an example of Application Software?", a: "Microsoft Word", options: ["Linux", "Device Driver", "Microsoft Word", "BIOS"] },
+                { q: "Lehman's 'Law of Increasing Complexity' implies that as a system evolves:", a: "Its structure degrades unless maintained", options: ["It becomes easier to use", "Its structure degrades unless maintained", "It requires less code", "It runs faster"] },
+                { q: "What category of software helps maintain, configure, or analyze a computer?", a: "Utility Software", options: ["Operating System", "Utility Software", "Firmware", "Application Software"] },
+                { q: "Which Lehman's Law states that the evolution process of a system is self-regulating with measurable trends?", a: "Self Regulation", options: ["Self Regulation", "Conservation of Familiarity", "Continuing Growth", "Feedback System"] },
+                { q: "Software that provides tools to assist a programmer in writing computer programs is called:", a: "Programming Software", options: ["Malware", "Programming Software", "System Software", "Database Software"] },
+                { q: "The 'Conservation of Organizational Stability' law suggests that:", a: "Development rate remains roughly constant regardless of resources", options: ["Adding more programmers speeds up a project", "Development rate remains roughly constant regardless of resources", "Organizations change rapidly", "Budget dictates software quality directly"] },
+                { q: "Which of these is NOT a typical Operating System function?", a: "Writing source code", options: ["Memory Management", "File Management", "Writing source code", "Process Management"] },
+                { q: "Lehman's 'Law of Continuing Growth' states that to maintain user satisfaction, a system must:", a: "Continually grow in functionality", options: ["Shrink in size", "Remain exactly the same", "Continually grow in functionality", "Be rewritten every year"] },
+                { q: "Firmware is typically stored in:", a: "ROM", options: ["RAM", "ROM", "Hard Drive", "Cloud Storage"] },
+                { q: "Which law emphasizes that software evolution processes constitute multi-level feedback systems?", a: "Feedback System", options: ["Feedback System", "Declining Quality", "Continuing Change", "Self Regulation"] },
+                { q: "Open-source software is defined by its:", a: "Publicly accessible source code", options: ["High cost", "Publicly accessible source code", "Lack of bugs", "Hardware dependency"] },
+                { q: "What does GUI stand for in the context of user interfaces?", a: "Graphical User Interface", options: ["General User Interface", "Graphical User Interface", "Global Unified Interface", "Graphical Utility Integration"] },
+                { q: "Proprietary software usually requires users to:", a: "Agree to a restrictive End User License Agreement (EULA)", options: ["Modify the source code", "Distribute it freely", "Agree to a restrictive End User License Agreement (EULA)", "Use it only offline"] },
+                { q: "Lehman's 'Law of Declining Quality' states quality will appear to decline unless:", a: "It is rigorously maintained and adapted to its environment", options: ["It is sold for a higher price", "It is rigorously maintained and adapted to its environment", "It is moved to the cloud", "It has fewer features"] },
+                { q: "A compiler falls under which category of software?", a: "Programming Software", options: ["Utility Software", "Application Software", "Programming Software", "System Software"] },
+                { q: "Which of the following best describes 'Software Evolution'?", a: "The ongoing process of updating and maintaining software", options: ["The initial writing of code", "The hardware manufacturing process", "The ongoing process of updating and maintaining software", "Deleting old software"] },
+                { q: "What is the primary purpose of an Operating System?", a: "To act as an interface between the user and computer hardware", options: ["To browse the internet", "To edit photos", "To act as an interface between the user and computer hardware", "To protect against viruses"] },
+                { q: "Lehman's Laws primarily apply to what type of software systems?", a: "Large, evolving business systems (E-type)", options: ["Small scripts", "Large, evolving business systems (E-type)", "Static math algorithms", "Hardware drivers"] },
+                { q: "Antivirus software is best categorized as:", a: "Utility Software", options: ["Application Software", "System Software", "Utility Software", "Firmware"] },
+                { q: "According to the Law of Conservation of Familiarity, why do large updates often fail?", a: "Users and developers cannot adapt to massive changes all at once", options: ["The code becomes too short", "Hardware cannot support it", "Users and developers cannot adapt to massive changes all at once", "It costs too much money"] },
+                { q: "Software that is delivered over the internet on a subscription basis is known as:", a: "SaaS (Software as a Service)", options: ["Freeware", "Shareware", "SaaS (Software as a Service)", "Firmware"] }
+            ]
+        },
+        {
+            title: "Module 2: Emerging Technologies",
+            questions: [
+                { q: "Which Industrial Revolution is marked by the fusion of physical, digital, and biological systems?", a: "Fourth Industrial Revolution", options: ["First", "Second", "Third", "Fourth Industrial Revolution"] },
+                { q: "Which technology uses a decentralized, distributed ledger system for secure transactions?", a: "Blockchain", options: ["IoT", "Blockchain", "Quantum Computing", "AR/VR"] },
+                { q: "What characterizes 'Emerging Technologies'?", a: "Ability to disrupt markets and create new industries", options: ["Technologies older than 20 years", "Ability to disrupt markets and create new industries", "Strictly hardware-based tools", "Manual manufacturing processes"] },
+                { q: "What does IoT stand for?", a: "Internet of Things", options: ["Internet of Technology", "Integration of Things", "Internet of Things", "Intelligent Operating Tools"] },
+                { q: "Which technology overlays digital information onto the real world?", a: "Augmented Reality (AR)", options: ["Virtual Reality (VR)", "Augmented Reality (AR)", "Artificial Intelligence", "Blockchain"] },
+                { q: "Which of the following describes Artificial Intelligence (AI)?", a: "Machines simulating human cognitive functions", options: ["Connecting household appliances to Wi-Fi", "Machines simulating human cognitive functions", "A physical ledger for banks", "Faster broadband networks"] },
+                { q: "Quantum computing uses 'qubits'. What makes a qubit different from a standard bit?", a: "It can be 0, 1, or both simultaneously", options: ["It can only be 1", "It is larger in physical size", "It can be 0, 1, or both simultaneously", "It requires no electricity"] },
+                { q: "What is Edge Computing?", a: "Processing data closer to where it is generated", options: ["Storing data in a centralized cloud", "Processing data closer to where it is generated", "Using older, outdated computers", "Computing on the edges of a monitor"] },
+                { q: "Which generation of mobile networks is designed specifically to support massive IoT deployments with low latency?", a: "5G", options: ["2G", "3G", "4G LTE", "5G"] },
+                { q: "In Blockchain, what ensures that a block cannot be altered without changing subsequent blocks?", a: "Cryptographic Hashing", options: ["Centralized databases", "Cryptographic Hashing", "Cloud storage", "Antivirus software"] },
+                { q: "Which emerging tech focuses on creating fully immersive, simulated digital environments?", a: "Virtual Reality (VR)", options: ["Augmented Reality (AR)", "Virtual Reality (VR)", "Big Data", "Robotic Process Automation"] },
+                { q: "What is Machine Learning?", a: "A subset of AI where systems learn from data without explicit programming", options: ["Robots learning to walk physically", "A subset of AI where systems learn from data without explicit programming", "Memorizing hardware specs", "A cloud computing model"] },
+                { q: "Smart Home devices like thermostats and smart bulbs are primary examples of:", a: "Internet of Things (IoT)", options: ["Blockchain", "Internet of Things (IoT)", "Quantum Computing", "Edge Computing"] },
+                { q: "RPA stands for:", a: "Robotic Process Automation", options: ["Remote Processing Application", "Robotic Process Automation", "Rapid Prototyping Algorithm", "Real-time Protocol Access"] },
+                { q: "Which technology is fundamental to cryptocurrencies like Bitcoin?", a: "Blockchain", options: ["Machine Learning", "IoT", "Blockchain", "5G"] },
+                { q: "What is the main advantage of Cloud Computing?", a: "On-demand access to computing resources over the internet", options: ["Local storage dependency", "On-demand access to computing resources over the internet", "Physical hardware ownership", "Slower processing speeds"] },
+                { q: "Biometrics technology is primarily used for:", a: "Authentication and Security", options: ["Faster internet", "Authentication and Security", "3D Printing", "Data visualization"] },
+                { q: "Autonomous vehicles rely heavily on which combinations of emerging technologies?", a: "AI, IoT, and Edge Computing", options: ["Blockchain and VR", "AI, IoT, and Edge Computing", "3D Printing and Quantum", "RPA and Cryptography"] },
+                { q: "What does 'Big Data' refer to?", a: "Extremely large datasets that may be analyzed computationally", options: ["A large hard drive", "Extremely large datasets that may be analyzed computationally", "A popular cloud provider", "High-resolution video files"] },
+                { q: "Digital Twins are:", a: "Virtual representations of physical objects or systems", options: ["Two identical smartphones", "Virtual representations of physical objects or systems", "A type of malware", "Dual-core processors"] },
+                { q: "Which technology is used to 'print' physical objects layer by layer?", a: "3D Printing (Additive Manufacturing)", options: ["Laser printing", "3D Printing (Additive Manufacturing)", "Holography", "Lithography"] },
+                { q: "Cybersecurity in the era of emerging technologies must shift towards:", a: "Proactive and AI-driven threat detection", options: ["Ignoring small threats", "Proactive and AI-driven threat detection", "Only protecting physical servers", "Using paper records"] },
+                { q: "A system that can process natural human language and respond intelligently is using:", a: "Natural Language Processing (NLP)", options: ["Quantum Supremacy", "Blockchain", "Natural Language Processing (NLP)", "Edge Computing"] },
+                { q: "The Metaverse is largely built upon which technologies?", a: "AR, VR, and Blockchain", options: ["Only HTML and CSS", "AR, VR, and Blockchain", "Analog radio frequencies", "Local Area Networks"] },
+                { q: "What is a primary ethical concern regarding AI?", a: "Bias in decision-making algorithms", options: ["It uses too much electricity", "Bias in decision-making algorithms", "It takes up too much hard drive space", "It requires 5G"] }
+            ]
+        },
+        {
+            title: "Module 4: Cross-Platform Development",
+            questions: [
+                { q: "Which framework was released by Google and uses the Dart programming language?", a: "Flutter", options: ["React Native", "Ionic", "Flutter", ".NET MAUI"] },
+                { q: "What is a major advantage of cross-platform development?", a: "Code Reusability", options: ["High Performance for 3D games", "Instant access to new OS features", "Code Reusability", "Deepest hardware integration"] },
+                { q: "Which approach requires building two separate apps using different languages like Swift and Kotlin?", a: "Native Development", options: ["Hybrid Development", "Cross-Platform Development", "Native Development", "Web Application"] },
+                { q: "React Native was created by which company?", a: "Meta (Facebook)", options: ["Google", "Apple", "Meta (Facebook)", "Microsoft"] },
+                { q: "Which technology relies heavily on web technologies (HTML, CSS, JS) running inside a WebView container?", a: "Hybrid/Ionic", options: ["Flutter", "Hybrid/Ionic", "SwiftUI", "Native Android"] },
+                { q: "What does 'Write Once, Run Anywhere' refer to?", a: "Cross-Platform Development", options: ["Native Development", "Cross-Platform Development", "Database Management", "UI/UX Design"] },
+                { q: "Flutter uses its own rendering engine named:", a: "Skia / Impeller", options: ["WebKit", "Gecko", "Skia / Impeller", "V8"] },
+                { q: "In React Native, UI components are mapped to:", a: "Native OS widgets", options: ["HTML Canvas", "Native OS widgets", "Flash components", "WebViews"] },
+                { q: "Which is a disadvantage of Cross-Platform frameworks compared to Native?", a: "Larger app file size and overhead", options: ["Longer development time", "Larger app file size and overhead", "Harder to learn than machine code", "Cannot use APIs"] },
+                { q: "Dart is a programming language primarily optimized for:", a: "UI creation and fast app performance", options: ["Database querying", "UI creation and fast app performance", "Operating system kernels", "Hardware drivers"] },
+                { q: "Xamarin (now .NET MAUI) uses which programming language?", a: "C#", options: ["Java", "C#", "Dart", "JavaScript"] },
+                { q: "Which of the following is an example of a Native programming language for iOS?", a: "Swift", options: ["Kotlin", "Dart", "Swift", "C#"] },
+                { q: "Which of the following is an example of a Native programming language for Android?", a: "Kotlin", options: ["Objective-C", "Kotlin", "Swift", "Ruby"] },
+                { q: "What is 'Hot Reload' in frameworks like Flutter and React Native?", a: "Viewing code changes instantly without restarting the app", options: ["Overheating the CPU", "Viewing code changes instantly without restarting the app", "Downloading the app from the store", "Compiling to machine code"] },
+                { q: "Which framework wraps a web application inside a native shell using Cordova or Capacitor?", a: "Ionic", options: ["Flutter", "Ionic", "React Native", "Xamarin"] },
+                { q: "Progressive Web Apps (PWAs) are:", a: "Websites that look and feel like mobile apps", options: ["Native iOS apps", "Websites that look and feel like mobile apps", "Desktop only applications", "Command-line tools"] },
+                { q: "A 'WebView' is basically:", a: "A browser embedded inside a mobile application", options: ["A camera interface", "A browser embedded inside a mobile application", "A database viewer", "A native button"] },
+                { q: "Why might a company choose Native over Cross-Platform?", a: "They are building a graphics-heavy 3D game", options: ["They want to save money", "They have a small team", "They are building a graphics-heavy 3D game", "They want to launch on Web simultaneously"] },
+                { q: "In Flutter, everything you see on the screen is a:", a: "Widget", options: ["Component", "Widget", "View", "Element"] },
+                { q: "What is Capacitor in the context of Ionic?", a: "A native runtime bridge for web apps", options: ["A UI library", "A native runtime bridge for web apps", "A database engine", "A CSS framework"] },
+                { q: "React Native uses a 'Bridge' to communicate between:", a: "JavaScript code and Native modules", options: ["The internet and local storage", "JavaScript code and Native modules", "iOS and Android devices", "HTML and CSS"] },
+                { q: "Which framework is known for compiling to native ARM code for both iOS and Android?", a: "Flutter", options: ["Ionic", "PhoneGap", "Flutter", "Cordova"] },
+                { q: "If your team only knows web development (HTML/CSS/JS), the fastest mobile path is:", a: "Ionic / Capacitor", options: ["Swift", "Ionic / Capacitor", "Kotlin", "Flutter"] },
+                { q: "Which UI approach does React Native take?", a: "Declarative UI", options: ["Imperative UI", "Declarative UI", "Drag-and-drop only", "Command-line UI"] },
+                { q: "Which of the following statements is true?", a: "Cross-platform development generally speeds up time-to-market.", options: ["Native apps always run slower than cross-platform apps.", "Cross-platform development generally speeds up time-to-market.", "Flutter cannot be deployed to the web.", "React Native does not support iOS."] }
+            ]
+        },
+        {
+            title: "Topic 2: SDLC & System Analysis",
+            questions: [
+                { q: "In which SDLC phase is the Feasibility Study conducted?", a: "System Planning", options: ["System Analysis", "System Design", "System Planning", "System Maintenance"] },
+                { q: "What is the primary output of the System Analysis phase?", a: "Requirement Specification Document (RSD)", options: ["Design Document", "Feasibility Study Report", "Source Code", "Requirement Specification Document (RSD)"] },
+                { q: "Which type of maintenance involves fixing errors found after deployment?", a: "Corrective Maintenance", options: ["Adaptive Maintenance", "Perfective Maintenance", "Preventive Maintenance", "Corrective Maintenance"] },
+                { q: "Who acts as the 'bridge' between business users and technical developers?", a: "System Analyst", options: ["Programmer", "Database Administrator", "System Analyst", "Project Sponsor"] },
+                { q: "What does SDLC stand for?", a: "Software Development Life Cycle", options: ["System Design Life Cycle", "Software Development Life Cycle", "Standard Data Logic Controller", "Systematic Development of Logic Code"] },
+                { q: "Which SDLC methodology is linear and sequential, where one phase must finish before the next begins?", a: "Waterfall Model", options: ["Agile Model", "Scrum", "Waterfall Model", "Spiral Model"] },
+                { q: "Which SDLC methodology focuses on iterative development, flexibility, and customer collaboration?", a: "Agile Model", options: ["Waterfall Model", "V-Model", "Agile Model", "Big Bang Model"] },
+                { q: "In the System Design phase, what is created?", a: "System Architecture and UI/UX layouts", options: ["The final code", "System Architecture and UI/UX layouts", "The business case", "User manuals"] },
+                { q: "The process of writing the actual code happens in which phase?", a: "Implementation / Development", options: ["Analysis", "Design", "Implementation / Development", "Maintenance"] },
+                { q: "Which testing ensures that individual components or functions work correctly in isolation?", a: "Unit Testing", options: ["System Testing", "Unit Testing", "Acceptance Testing", "Integration Testing"] },
+                { q: "What is User Acceptance Testing (UAT)?", a: "Testing done by the client/end-user to approve the system", options: ["Testing done by the lead developer", "Testing done by the client/end-user to approve the system", "Testing the database speed", "Automated code testing"] },
+                { q: "A Data Flow Diagram (DFD) is typically created during which phase?", a: "System Analysis", options: ["Implementation", "Maintenance", "System Analysis", "Testing"] },
+                { q: "What type of feasibility checks if the organization has the necessary hardware and software?", a: "Technical Feasibility", options: ["Economic Feasibility", "Operational Feasibility", "Technical Feasibility", "Schedule Feasibility"] },
+                { q: "Which phase is the longest and most expensive in the entire lifecycle of a successful software product?", a: "Maintenance", options: ["Planning", "Design", "Implementation", "Maintenance"] },
+                { q: "Adaptive Maintenance refers to:", a: "Modifying the system to cope with a changing environment (e.g., new OS)", options: ["Fixing bugs", "Adding completely new features", "Modifying the system to cope with a changing environment (e.g., new OS)", "Preventing future crashes"] },
+                { q: "What does an Entity-Relationship Diagram (ERD) primarily model?", a: "Database structures and data relationships", options: ["Network hardware", "Database structures and data relationships", "User interface screens", "Project timelines"] },
+                { q: "Which deployment strategy involves running the old system and new system simultaneously?", a: "Parallel Deployment", options: ["Direct Cutover", "Phased Deployment", "Parallel Deployment", "Pilot Deployment"] },
+                { q: "Which deployment strategy drops the old system and immediately switches to the new one?", a: "Direct Cutover", options: ["Parallel Deployment", "Pilot Deployment", "Phased Deployment", "Direct Cutover"] },
+                { q: "A 'Sprint' is a short, time-boxed period of development used in which framework?", a: "Scrum (Agile)", options: ["Waterfall", "Scrum (Agile)", "V-Model", "Iterative"] },
+                { q: "During System Planning, identifying what the system should and should NOT do is defining the:", a: "Project Scope", options: ["Project Budget", "Project Scope", "System Architecture", "Source Code"] },
+                { q: "What is a 'Prototype'?", a: "A preliminary model or mock-up of the system", options: ["The final deployed application", "A preliminary model or mock-up of the system", "The database server", "A piece of malware"] },
+                { q: "Gathering requirements via interviews, questionnaires, and observation occurs in:", a: "System Analysis", options: ["System Planning", "System Analysis", "System Design", "Testing"] },
+                { q: "Which role is primarily responsible for ensuring the project is delivered on time and within budget?", a: "Project Manager", options: ["System Analyst", "Lead Developer", "Project Manager", "QA Tester"] },
+                { q: "Perfective maintenance involves:", a: "Improving system performance or adding enhancements", options: ["Fixing critical crashes", "Adapting to Windows 11", "Improving system performance or adding enhancements", "Rewriting the system from scratch"] },
+                { q: "The 'V-Model' of SDLC emphasizes:", a: "Verification and Validation (testing aligned with each dev phase)", options: ["Visual design over coding", "Verification and Validation (testing aligned with each dev phase)", "Very fast deployment", "Virtual reality integration"] }
+            ]
+        }
+    ];
+
+    let currentModule = 0;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function showMenu() {
+        document.getElementById('menu-screen').classList.remove('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.add('hidden');
+    }
+
+    function startQuiz(index) {
+        currentModule = index;
+        currentQuestionIndex = 0;
+        score = 0;
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const module = quizData[currentModule];
+        const q = module.questions[currentQuestionIndex];
+        const total = module.questions.length;
+        
+        answered = false;
+        document.getElementById('module-title').innerText = module.title;
+        document.getElementById('q-current').innerText = currentQuestionIndex + 1;
+        document.getElementById('q-total').innerText = total;
+        document.getElementById('running-score').innerText = score;
+        
+        // Update Progress Bar
+        const progressPercent = ((currentQuestionIndex) / total) * 100;
+        document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+
+        document.getElementById('question-text').innerText = `${currentQuestionIndex + 1}. ${q.q}`;
+        document.getElementById('feedback').classList.add('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        // Shuffle options slightly for better studying
+        let shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn, q.a);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btn, correct) {
+        if (answered) return;
+        answered = true;
+        
+        const feedback = document.getElementById('feedback');
+        feedback.classList.remove('hidden');
+
+        // Highlight correct answer no matter what they clicked
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => {
+            if(b.innerText === correct) {
+                b.classList.add('correct');
+            }
+            b.style.pointerEvents = 'none'; // Disable further clicking
+        });
+
+        if (selected === correct) {
+            score++;
+            document.getElementById('running-score').innerText = score;
+            feedback.innerText = "✅ Correct!";
+            feedback.style.backgroundColor = "#dcfce7";
+            feedback.style.color = "#166534";
+        } else {
+            btn.classList.add('wrong');
+            feedback.innerText = `❌ Incorrect. The correct answer is: ${correct}`;
+            feedback.style.backgroundColor = "#fee2e2";
+            feedback.style.color = "#991b1b";
+        }
+        
+        // Update Progress Bar to include current answered question
+        const total = quizData[currentModule].questions.length;
+        const progressPercent = ((currentQuestionIndex + 1) / total) * 100;
+        document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+
+        // Change button text if it's the last question
+        const nextBtn = document.getElementById('next-btn');
+        if(currentQuestionIndex === total - 1) {
+            nextBtn.innerText = "Finish Quiz ➔";
+        } else {
+            nextBtn.innerText = "Next Question ➔";
+        }
+        nextBtn.classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData[currentModule].questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        
+        const total = quizData[currentModule].questions.length;
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('max-score').innerText = total;
+
+        const message = document.getElementById('result-message');
+        const percentage = (score / total) * 100;
+
+        if(percentage >= 90) message.innerText = "Excellent work! You've mastered this module.";
+        else if(percentage >= 70) message.innerText = "Great job! Just a little more review needed.";
+        else if(percentage >= 50) message.innerText = "Good effort. Review the concepts and try again.";
+        else message.innerText = "Keep studying! You'll get it next time.";
+    }
+
+    function retryQuiz() {
+        startQuiz(currentModule);
+    }
+</script>
+
+</body>
+</html>

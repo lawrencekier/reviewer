@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT PROF EL 3 Ultimate Quiz (60 Items)</title>
+    <style>
+        :root { --primary: #10b981; --primary-dark: #059669; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --text-muted: #94a3b8; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; margin: 0; min-height: 100vh; align-items: center; }
+        .card { background: var(--card-bg); width: 100%; max-width: 750px; padding: 2.5rem; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid #334155; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h2 { margin: 0; color: var(--primary); font-size: 1.6rem; letter-spacing: 0.5px; }
+        .progress-container { font-weight: bold; color: var(--primary); font-size: 1.1rem; background: #0f172a; padding: 6px 15px; border-radius: 20px; border: 1px solid #334155; }
+        .progress-bar { height: 8px; background: #334155; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; box-shadow: 0 0 10px var(--primary); }
+        
+        .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 25px; line-height: 1.5; color: #f1f5f9; }
+
+        .options { display: grid; gap: 12px; }
+        .option-btn { 
+            padding: 16px; border: 2px solid #334155; border-radius: 10px; 
+            background: #0f172a; font-size: 1.05rem; text-align: left; 
+            cursor: pointer; transition: all 0.2s ease; font-weight: 500; color: var(--text);
+        }
+        .option-btn:hover:not(:disabled) { border-color: var(--primary); background: #1e293b; transform: translateX(5px); box-shadow: -5px 0 0 var(--primary); }
+        .option-btn.correct { background: var(--primary-dark); color: white; border-color: var(--primary); box-shadow: none; }
+        .option-btn.wrong { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger); box-shadow: none; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+
+        .next-btn { 
+            width: 100%; padding: 16px; margin-top: 30px; border: none; 
+            border-radius: 10px; background: var(--text); color: var(--bg); 
+            font-size: 1.15rem; font-weight: bold; cursor: pointer; display: none; transition: 0.2s;
+        }
+        .next-btn:hover { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="quiz-card">
+    <div class="header">
+        <h2>IT PROF EL 3 Master Quiz</h2>
+        <div class="progress-container" id="q-counter">1 / 60</div>
+    </div>
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+
+    <div class="question-text" id="question">Loading question...</div>
+    
+    <div class="options" id="options"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➔</button>
+</div>
+
+<script>
+    const questions = [
+        // --- ORIGINAL 30 QUESTIONS ---
+        { q: "Which protocol is faster but less reliable?", options: ["TCP", "HTTP", "FTP"], answer: "UDP" },
+        { q: "Which protocol ensures reliable data delivery?", options: ["UDP", "IP", "SMTP"], answer: "TCP" },
+        { q: "What is a foreign key used for?", options: ["Sort data faster", "Encrypt user passwords", "Delete duplicate records"], answer: "Connect tables together" },
+        { q: "What does CRUD stand for?", options: ["Copy, Run, Undo, Deploy", "Compile, Run, Upload, Download", "Catch, Route, Update, Drop"], answer: "Create, Read, Update, Delete" },
+        { q: "Which HTTP method is used to retrieve data?", options: ["POST", "PUT", "DELETE"], answer: "GET" },
+        { q: "What does REST stand for?", options: ["Real-time System Transfer", "Relational Storage Technology", "Remote Execution State Tool"], answer: "Representational State Transfer" },
+        { q: "What does DOM stand for?", options: ["Data Output Module", "Digital Origin Method", "Dynamic Object Manipulation"], answer: "Document Object Model" },
+        { q: "Which language adds interactivity to web pages?", options: ["HTML", "CSS", "SQL"], answer: "JavaScript" },
+        { q: "Which is a common example of a client?", options: ["Web Server", "Database", "Router"], answer: "Web Browser" },
+        { q: "What are the layers of a 3-tier architecture?", options: ["Client, Server, Network", "Physical, Data Link, Network", "Frontend, Backend, Middleware"], answer: "Presentation, Application, Data layer" },
+        { q: "What best describes a client in a network?", options: ["A machine that stores large databases", "A protocol for routing packets", "A firewall that protects the system"], answer: "A program/device that requests services" },
+        { q: "What does scalability mean?", options: ["Ability to encrypt network traffic", "Ability to compress file sizes", "Ability to render 3D graphics"], answer: "Ability to handle increased workload" },
+        { q: "Which is commonly used as a code editor/IDE?", options: ["Apache", "MySQL", "Nginx"], answer: "Visual Studio Code" },
+        { q: "What is the role of a local server?", options: ["Connect to satellite networks", "Store global DNS records", "Block malicious internet traffic"], answer: "Simulate a production server for testing" },
+        { q: "What is a server-side program?", options: ["Code that runs in the browser", "A mobile application UI", "A styling stylesheet"], answer: "Code that runs on the server" },
+        { q: "Which API is used for AJAX in modern JS?", options: ["DOM API", "Canvas API", "WebGL API"], answer: "Fetch API" },
+        { q: "What is the purpose of multithreading in a server?", options: ["Improve database indexing", "Compress images on the fly", "Generate SSL certificates"], answer: "Handle multiple clients simultaneously" },
+        { q: "Which connects application to database?", options: ["HTML tags", "CSS stylesheets", "Network router"], answer: "Server-side script" },
+        { q: "What is the purpose of a development environment?", options: ["Host applications for the public", "Store permanent user backups", "Route traffic between servers"], answer: "Create and test applications" },
+        { q: "Which data format is commonly used in REST APIs?", options: ["XML", "CSV", "YAML"], answer: "JSON" },
+        { q: "Which operation retrieves data from a database?", options: ["INSERT", "UPDATE", "DELETE"], answer: "SELECT" },
+        { q: "Which task is handled by server-side programs?", options: ["Browser rendering", "CSS animations", "DOM manipulation"], answer: "Database interaction" },
+        { q: "What advantage does server-side programming provide?", options: ["Faster UI rendering", "Offline browser support", "Less bandwidth usage"], answer: "Better data security and processing" },
+        { q: "Which is a client-server application example?", options: ["A standalone calculator app", "A text document on a USB", "A single-player offline game"], answer: "Online banking system" },
+        { q: "Which component initiates communication?", options: ["Server", "Database", "Switch"], answer: "Client" },
+        { q: "Which stores structured data?", options: ["Web Server", "Load Balancer", "DNS Server"], answer: "Database server" },
+        { q: "Which layer handles user interaction?", options: ["Data layer", "Application layer", "Network layer"], answer: "Presentation layer" },
+        { q: "Which tool helps developers track changes in code?", options: ["Node.js", "Docker", "Jenkins"], answer: "Git" },
+        { q: "Which software stack is used for web development?", options: ["OSI Model", "TCP/IP Stack", "ELK Stack"], answer: "LAMP Stack" },
+        { q: "Which is a server-side language?", options: ["HTML", "CSS", "React"], answer: "PHP" },
+
+        // --- 30 NEW QUESTIONS FROM MODULES 1-7 ---
+        { q: "In a 2-tier architecture, what type of client handles both the UI and the bulk of the business logic?", options: ["Thin Client", "Zero Client", "Dumb Terminal"], answer: "Fat Client" },
+        { q: "What is the definition of a 'Thin Client'?", options: ["A client that stores a large local database", "A server that has minimal RAM", "A network router with low bandwidth"], answer: "A client that relies heavily on the server for processing" },
+        { q: "What characteristic ensures a server is always available to handle client requests?", options: ["Load Balancing", "Network Latency", "Data Encryption"], answer: "High Availability" },
+        { q: "What does the 'A' in the LAMP stack stand for?", options: ["Angular", "Application", "AJAX"], answer: "Apache" },
+        { q: "Which cross-platform software bundle provides a local server environment containing Apache, MariaDB, PHP, and Perl?", options: ["Node.js", "Docker", "Visual Studio Code"], answer: "XAMPP" },
+        { q: "Which server-side language is known for popular frameworks like Django and Flask?", options: ["Ruby", "PHP", "Java"], answer: "Python" },
+        { q: "What handles concurrent client requests by assigning a separate process or thread to each request?", options: ["Single-threading", "Event Loop", "Asynchronous polling"], answer: "Multiprocessing / Multithreading" },
+        { q: "What standard language is used for managing and querying relational databases?", options: ["HTML", "JavaScript", "Python"], answer: "SQL" },
+        { q: "What does the 'R' in RDBMS stand for?", options: ["Redundant", "Remote", "Real-time"], answer: "Relational" },
+        { q: "In a database, what uniquely identifies each record in a table?", options: ["Foreign Key", "Index", "Column Name"], answer: "Primary Key" },
+        { q: "Which SQL statement is used to add a new record to a table?", options: ["UPDATE", "ADD", "CREATE"], answer: "INSERT" },
+        { q: "What is the process of organizing database tables to minimize data redundancy?", options: ["Indexing", "Encryption", "Hashing"], answer: "Normalization" },
+        { q: "Which technology is responsible for the basic structure and semantics of a webpage?", options: ["CSS", "JavaScript", "PHP"], answer: "HTML" },
+        { q: "Which technology handles the visual styling and layout of a webpage?", options: ["HTML", "JavaScript", "Python"], answer: "CSS" },
+        { q: "Which popular framework acts as a CSS library to easily build responsive, mobile-first websites?", options: ["React", "Express", "Django"], answer: "Bootstrap" },
+        { q: "Which HTTP method is typically used to submit new data to be processed to a specified resource?", options: ["GET", "PUT", "DELETE"], answer: "POST" },
+        { q: "Which HTTP status code typically indicates a successful request?", options: ["404 Not Found", "500 Internal Error", "301 Moved"], answer: "200 OK" },
+        { q: "What does the HTTP status code 404 indicate?", options: ["Server Error", "Unauthorized", "Forbidden"], answer: "Not Found" },
+        { q: "In RESTful APIs, what does a URL/URI fundamentally represent?", options: ["An action", "A server configuration", "A database query"], answer: "A resource" },
+        { q: "Which characteristic of REST implies that the server does not store any client context between requests?", options: ["Cacheability", "Layered System", "Uniform Interface"], answer: "Statelessness" },
+        { q: "What does AJAX stand for?", options: ["Advanced Java and XML", "Asynchronous JSON and XHTML", "Automated JavaScript XML"], answer: "Asynchronous JavaScript and XML" },
+        { q: "Which technology allows for full-duplex, real-time, two-way communication between client and server?", options: ["REST API", "HTTP/1.1", "AJAX polling"], answer: "WebSockets" },
+        { q: "Which built-in browser object was traditionally used to execute AJAX calls before the Fetch API?", options: ["JSONParser", "DOMHttpObject", "WebWorker"], answer: "XMLHttpRequest" },
+        { q: "Which layer of the OSI model ensures reliable, error-free data transmission between applications?", options: ["Network Layer", "Physical Layer", "Data Link Layer"], answer: "Transport Layer" },
+        { q: "Which type of server acts as an intermediary for requests from clients seeking resources from other servers?", options: ["Database Server", "Mail Server", "File Server"], answer: "Proxy Server" },
+        { q: "Which format has largely replaced XML for transmitting structured data in modern web APIs?", options: ["HTML", "CSV", "YAML"], answer: "JSON" },
+        { q: "Which HTTP header is commonly used to indicate the media type of the resource being sent (e.g., application/json)?", options: ["Authorization", "User-Agent", "Accept-Language"], answer: "Content-Type" },
+        { q: "What server-side environment allows you to run JavaScript outside of a web browser?", options: ["Apache", "Nginx", "Tomcat"], answer: "Node.js" },
+        { q: "Which HTTP method is intended to completely replace a target resource with the uploaded content?", options: ["POST", "PATCH", "GET"], answer: "PUT" },
+        { q: "In a typical client-server handshake, what initiates the connection?", options: ["The Database", "The Server", "The Router"], answer: "The Client Request" }
+    ];
+
+    // Fisher-Yates Shuffle
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    let shuffledQuestions = shuffleArray([...questions]);
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const data = shuffledQuestions[currentIdx];
+        document.getElementById('q-counter').innerText = `${currentIdx + 1} / ${shuffledQuestions.length}`;
+        document.getElementById('progress-fill').style.width = `${(currentIdx / shuffledQuestions.length) * 100}%`;
+        document.getElementById('question').innerText = data.q;
+
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = "";
+        
+        // Combine answer and distractors, then shuffle
+        let allOptions = shuffleArray([...data.options, data.answer]);
+        
+        allOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn, data.answer);
+            optionsDiv.appendChild(btn);
+        });
+
+        document.getElementById('next-btn').style.display = "none";
+    }
+
+    function checkAnswer(selected, btn, correct) {
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            allBtns.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+        }
+        document.getElementById('next-btn').style.display = "block";
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < shuffledQuestions.length) {
+            loadQuestion();
+        } else {
+            showFinal();
+        }
+    }
+
+    function showFinal() {
+        document.getElementById('progress-fill').style.width = "100%";
+        
+        let message = "";
+        const percentage = (score / shuffledQuestions.length) * 100;
+        if(percentage >= 90) message = "Exceptional! You're ready to ace IT PROF EL 3.";
+        else if(percentage >= 75) message = "Solid work! A quick review will get you a perfect score.";
+        else message = "Good practice! Run the reviewer again to lock in those definitions.";
+
+        document.getElementById('quiz-card').innerHTML = `
+            <div style="text-align:center; padding: 3rem 0;">
+                <div style="font-size: 5rem; margin-bottom: 20px;">🌐</div>
+                <h2 style="color: var(--primary); font-size: 2.2rem; margin-bottom: 10px;">Simulation Complete!</h2>
+                <p style="font-size: 1.5rem; margin-bottom: 10px; color: white;">Your Score: <strong>${score} / ${shuffledQuestions.length}</strong></p>
+                <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px;">${message}</p>
+                <button class="next-btn" style="display:block; background: var(--primary); color: white;" onclick="location.reload()">Re-initialize Quiz</button>
+            </div>
+        `;
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

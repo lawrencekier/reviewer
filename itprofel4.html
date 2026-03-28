@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT PROF EL 4 Master Reviewer (50 Items)</title>
+    <style>
+        :root { --primary: #3b82f6; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --success: #10b981; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; margin: 0; min-height: 100vh; align-items: center; }
+        .card { background: var(--card); width: 100%; max-width: 750px; padding: 2.5rem; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h2 { margin: 0; color: var(--primary); font-size: 1.6rem; }
+        .progress-bar { height: 8px; background: #334155; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+        .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 25px; line-height: 1.5; color: #f1f5f9; }
+        
+        .options { display: grid; gap: 12px; }
+        .option-btn { 
+            padding: 16px; border: 2px solid #334155; border-radius: 10px; 
+            background: var(--bg); font-size: 1.05rem; text-align: left; 
+            cursor: pointer; transition: 0.2s; color: var(--text); font-weight: 500;
+        }
+        .option-btn:hover:not(:disabled) { border-color: var(--primary); background: #1e293b; transform: translateX(5px); }
+        .option-btn.correct { background: var(--success); border-color: var(--success); color: white; }
+        .option-btn.wrong { background: rgba(239,68,68,0.2); border-color: var(--danger); color: #fca5a5; }
+        .option-btn:disabled { cursor: not-allowed; }
+
+        .next-btn { 
+            width: 100%; padding: 16px; margin-top: 25px; border: none; 
+            border-radius: 10px; background: #cbd5e1; color: #0f172a; 
+            font-size: 1.15rem; font-weight: bold; cursor: pointer; display: none; transition: 0.2s;
+        }
+        .next-btn:hover { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="quiz-card">
+    <div class="header">
+        <h2>IT PROF EL 4 Ultimate Quiz</h2>
+        <div id="q-counter" style="font-weight: bold; color: var(--primary); font-size: 1.1rem;">1 / 50</div>
+    </div>
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+    
+    <div class="question-text" id="question">Loading...</div>
+    
+    <div class="options" id="options"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➔</button>
+</div>
+
+<script>
+    const questions = [
+        // --- 25 RETAINED QUESTIONS FROM USER ---
+        { q: "System allows multiple tasks to run simultaneously — which element represents this?", options: ["Fork Node", "Merge Node", "Initial Node"], answer: "Decision Node" },
+        { q: "What is the purpose of swimlanes in an activity diagram?", options: ["Show time sequence", "Represent data flow", "Connect databases"], answer: "Divide responsibilities among actors" },
+        { q: "Which element represents a decision point in an activity diagram?", options: ["Rectangle", "Oval", "Solid Circle"], answer: "Diamond" },
+        { q: "Which symbol represents the start of an activity diagram?", options: ["Diamond", "Rectangle", "Dashed line"], answer: "Circle/Initial node" },
+        { q: "What does an activity diagram represent?", options: ["Database schema", "Network topology", "Hardware deployment"], answer: "Workflow of activities in a system" },
+        { q: "Which symbol is typically used to represent a use case?", options: ["Stick figure", "Rectangle", "Diamond"], answer: "Oval" },
+        { q: "In a use case diagram, the student is considered what?", options: ["Use Case", "System Boundary", "Relationship"], answer: "Actor" },
+        { q: "Which relationship represents a 'has-a' relationship?", options: ["Inheritance", "Generalization", "Realization"], answer: "Aggregation" },
+        { q: "A class contains an object that can exist independently — what relationship is this?", options: ["Composition", "Inheritance", "Dependency"], answer: "Aggregation" },
+        { q: "Which concept represents an 'is-a' relationship?", options: ["Aggregation", "Composition", "Association"], answer: "Inheritance" },
+        { q: "Which diagram is considered a behavioral UML diagram?", options: ["Class Diagram", "Component Diagram", "Deployment Diagram"], answer: "Activity Diagram" },
+        { q: "Which type of UML diagram focuses on the structure of the system?", options: ["Behavioral Diagram", "Interaction Diagram", "Sequence Diagram"], answer: "Structural Diagram" },
+        { q: "What does UML stand for?", options: ["Universal Markup Language", "Unified Method Logic", "Universal Modeling Layout"], answer: "Unified Modeling Language" },
+        { q: "What is the main purpose of UML in software development?", options: ["To compile source code", "To manage database queries", "To host web applications"], answer: "To model and visualize software systems" },
+        { q: "A team wants to visualize structure and behavior before coding — what should they use?", options: ["ER Diagrams", "Flowcharts", "Network Topologies"], answer: "UML Diagrams" },
+        { q: "In a sequence diagram, time flows in which direction?", options: ["Left to right", "Bottom to top", "Right to left"], answer: "Top to bottom" },
+        { q: "What is a lifeline in a sequence diagram?", options: ["The network connection speed", "The total time of the project", "The user's session duration"], answer: "The existence of an object during interaction" },
+        { q: "Messages in communication diagrams are usually labeled with?", options: ["Letters", "Colors", "Roman Numerals"], answer: "Numbers" },
+        { q: "In a use case diagram, who interacts with the system?", options: ["Database", "Developer", "Server"], answer: "Actor" },
+        { q: "A system analyst wants to present system components and interactions — best tool?", options: ["Gantt Chart", "Wireframe", "Source Code"], answer: "UML Diagram" },
+        { q: "Which diagram emphasizes object relationships and message paths rather than time order?", options: ["Sequence Diagram", "Timing Diagram", "State Machine Diagram"], answer: "Communication Diagram" },
+        { q: "What element connects objects in a communication diagram?", options: ["Swimlanes", "Lifelines", "Nodes"], answer: "Links" },
+        { q: "Interfaces are used to:", options: ["Store database records", "Execute background threads", "Manage network routing"], answer: "Define behavior without implementation" },
+        { q: "Which message requires the sender to wait for a response?", options: ["Asynchronous", "Self-referencing", "Reply"], answer: "Synchronous" },
+        { q: "Which section of a class contains data or properties?", options: ["Methods", "Operations", "Events"], answer: "Attributes" },
+
+        // --- 25 NEW BONUS QUESTIONS ---
+        { q: "What element draws the scope of the system in a Use Case diagram?", options: ["Lifeline", "Swimlane", "Actor Box"], answer: "System Boundary" },
+        { q: "Which relationship is used when a use case conditionally adds optional steps to another use case?", options: ["<<include>>", "<<generalization>>", "<<realization>>"], answer: "<<extend>>" },
+        { q: "Which relationship represents a mandatory inclusion of another use case's behavior?", options: ["<<extend>>", "<<generalization>>", "<<association>>"], answer: "<<include>>" },
+        { q: "Which node brings multiple concurrent threads back together into a single flow in an activity diagram?", options: ["Merge Node", "Decision Node", "Final Node"], answer: "Join Node" },
+        { q: "What symbol represents the end of an activity diagram?", options: ["Diamond", "Rectangle", "Hollow circle"], answer: "Solid circle with a hollow circle inside" },
+        { q: "Which relationship indicates strong ownership where the child CANNOT exist without the parent?", options: ["Aggregation", "Inheritance", "Realization"], answer: "Composition" },
+        { q: "In a class diagram, what visibility modifier is represented by a minus sign (-)?", options: ["Public", "Protected", "Package"], answer: "Private" },
+        { q: "In a class diagram, what visibility modifier is represented by a plus sign (+)?", options: ["Private", "Protected", "Package"], answer: "Public" },
+        { q: "What symbol represents a 'protected' attribute or method in a Class Diagram?", options: ["+", "-", "~"], answer: "#" },
+        { q: "What type of message in a Sequence Diagram is drawn with a dashed line and open arrowhead?", options: ["Synchronous Message", "Asynchronous Message", "Create Message"], answer: "Reply / Return Message" },
+        { q: "What represents the time an object is actively executing a process on the lifeline?", options: ["System Boundary", "Swimlane", "Actor Box"], answer: "Activation Box" },
+        { q: "Which of the following is NOT a structural diagram?", options: ["Class Diagram", "Component Diagram", "Object Diagram"], answer: "State Machine Diagram" },
+        { q: "Which of the following is NOT a behavioral diagram?", options: ["Use Case Diagram", "Activity Diagram", "Sequence Diagram"], answer: "Deployment Diagram" },
+        { q: "What does multiplicity '1..*' mean in a class diagram?", options: ["Exactly one", "Zero or more", "Zero or one"], answer: "One or more" },
+        { q: "What does multiplicity '0..1' mean in a class diagram?", options: ["Exactly one", "Zero or more", "One or more"], answer: "Zero or one" },
+        { q: "What shape represents an action or step in an Activity Diagram?", options: ["Diamond", "Solid Circle", "Stick Figure"], answer: "Rounded Rectangle" },
+        { q: "What symbol represents an object's destruction in a Sequence Diagram?", options: ["Dashed arrow", "Solid circle", "Square box"], answer: "Large X on the lifeline" },
+        { q: "In a Use Case Diagram, a line connecting an actor to a use case is called?", options: ["Generalization", "Extension", "Inclusion"], answer: "Association" },
+        { q: "A dotted arrow with a hollow triangle pointing to an interface represents?", options: ["Generalization", "Dependency", "Aggregation"], answer: "Realization" },
+        { q: "A solid line with a hollow triangle pointing to a parent class represents?", options: ["Realization", "Dependency", "Aggregation"], answer: "Generalization" },
+        { q: "Which message type does NOT require the sender to wait for a response?", options: ["Synchronous Message", "Reply Message", "Return Message"], answer: "Asynchronous Message" },
+        { q: "What is another name for a Communication Diagram in older UML versions?", options: ["Sequence Diagram", "Interaction Overview Diagram", "Statechart Diagram"], answer: "Collaboration Diagram" },
+        { q: "Who are considered the original creators of UML (The Three Amigos)?", options: ["Gates, Jobs, and Wozniak", "Turing, von Neumann, and Dijkstra", "Berners-Lee, Andreessen, and Clark"], answer: "Booch, Rumbaugh, and Jacobson" },
+        { q: "In a deployment diagram, what represents a physical piece of hardware?", options: ["Component", "Class", "Artifact"], answer: "Node" },
+        { q: "What relationship is depicted by a dashed arrow showing that one element requires another to function?", options: ["Generalization", "Aggregation", "Composition"], answer: "Dependency" }
+    ];
+
+    // True Randomization Function (Fisher-Yates Shuffle)
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    let shuffledQuestions = shuffleArray([...questions]);
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const data = shuffledQuestions[currentIdx];
+        document.getElementById('q-counter').innerText = `${currentIdx + 1} / ${shuffledQuestions.length}`;
+        document.getElementById('progress-fill').style.width = `${(currentIdx / shuffledQuestions.length) * 100}%`;
+        document.getElementById('question').innerText = data.q;
+
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = "";
+        
+        // Combine options and answer, then shuffle
+        let allOptions = shuffleArray([...data.options, data.answer]);
+        
+        allOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn, data.answer);
+            optionsDiv.appendChild(btn);
+        });
+        document.getElementById('next-btn').style.display = "none";
+    }
+
+    function checkAnswer(selected, btn, correct) {
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            allBtns.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+        }
+        document.getElementById('next-btn').style.display = "block";
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < shuffledQuestions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('progress-fill').style.width = "100%";
+            document.getElementById('quiz-card').innerHTML = `
+                <div style="text-align:center; padding: 2rem 0;">
+                    <div style="font-size: 5rem; margin-bottom: 15px;">💯</div>
+                    <h2 style="color: var(--primary); font-size: 2.2rem; margin-bottom: 10px;">Simulation Complete!</h2>
+                    <p style="font-size: 1.3rem; color: #f1f5f9;">Final Score: <strong>${score} / ${shuffledQuestions.length}</strong></p>
+                    <button class="next-btn" style="display:block; margin-top: 30px; background: var(--primary); color: white;" onclick="location.reload()">Re-Initialize Quiz</button>
+                </div>
+            `;
+        }
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

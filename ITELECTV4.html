@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITELECTV 4 (SAM): 100-Item Reviewer</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --error: #dc2626;
+            --error-bg: #fee2e2;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 { text-align: center; color: var(--primary); margin-bottom: 10px; }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 25px; }
+
+        .hidden { display: none !important; }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: var(--primary);
+            color: white;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        
+        .btn-center { text-align: center; justify-content: center; }
+        .btn-secondary { background: var(--text-muted); }
+        .btn-secondary:hover { background: #475569; }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: #f8fafc;
+            color: var(--text-main);
+            border: 2px solid transparent;
+            margin-bottom: 12px;
+            padding: 14px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) { background: #e2e8f0; }
+        .option-btn:disabled { cursor: default; }
+
+        .option-btn.correct { 
+            background: var(--success-bg) !important; 
+            border-color: var(--success); 
+            color: #14532d; 
+        }
+        
+        .option-btn.wrong { 
+            background: var(--error-bg) !important; 
+            border-color: var(--error); 
+            color: #7f1d1d; 
+        }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 15px;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+        
+        .score-total { font-size: 2rem; color: var(--text-muted); }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 20px 15px; }
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.25rem; }
+            .subtitle { font-size: 0.95rem; }
+            .btn { font-size: 15px; padding: 14px 15px; }
+            .question-text { font-size: 1.15rem; }
+            .option-btn { font-size: 15px; padding: 12px 15px; }
+            .nav-controls { flex-direction: column-reverse; }
+            .nav-controls button { width: 100%; justify-content: center; text-align: center;}
+            .score-display { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="menu-screen">
+        <h1>System Admin & Maintenance (SAM)</h1>
+        <p class="subtitle">Complete 100-Item Reviewer</p>
+        <div class="menu-grid" id="module-menu">
+            </div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <h2 id="module-title">Module Title</h2>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div class="stats">
+            <span>Question <span id="q-current">1</span> of <span id="q-total">25</span></span>
+            <span>Score: <span id="current-score">0</span></span>
+        </div>
+        
+        <div id="question-text" class="question-text"></div>
+        <div id="options-container"></div>
+        <div id="feedback" class="feedback hidden"></div>
+        
+        <div class="nav-controls">
+            <button class="btn btn-secondary btn-center" onclick="showMenu()">Exit Module</button>
+            <button id="next-btn" class="btn btn-center hidden" onclick="nextQuestion()">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <div id="results-screen" class="hidden">
+        <h2>Module Completed!</h2>
+        <div class="score-display">
+            <span id="final-score">0</span><span class="score-total" id="max-score">/25</span>
+        </div>
+        <p id="result-message" style="text-align: center; font-size: 1.2rem; margin-bottom: 30px; font-weight: bold;"></p>
+        <div class="menu-grid">
+            <button class="btn btn-center" onclick="retryQuiz()">Retry Module</button>
+            <button class="btn btn-secondary btn-center" onclick="showMenu()">Back to Main Menu</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 100-Item Question Bank across 4 Main Modules
+    const quizData = [
+        {
+            title: "Module 1: Computer Concepts & Hardware",
+            questions: [
+                { q: "What is an electronic device that accepts, processes, stores, and outputs data?", a: "Computer", options: ["Router", "Flash Drive", "Motherboard", "Computer"] },
+                { q: "What refers to the tangible, physical parts of a computer?", a: "Hardware", options: ["Software", "Hardware", "Firmware", "Network"] },
+                { q: "Which of the following is considered an input device?", a: "Keyboard", options: ["Monitor", "Printer", "Keyboard", "Speaker"] },
+                { q: "What is considered the 'brain' of the computer, responsible for executing instructions?", a: "CPU", options: ["Motherboard", "RAM", "Hard Drive", "CPU"] },
+                { q: "Which component provides temporary storage for data and instructions currently in use?", a: "RAM", options: ["HDD", "SSD", "RAM", "PSU"] },
+                { q: "Which storage device uses flash memory and is generally faster than a traditional hard drive?", a: "SSD", options: ["HDD", "SSD", "CD-ROM", "Floppy Disk"] },
+                { q: "What type of computer is very powerful, very expensive, and used by large organizations like banks?", a: "Mainframe", options: ["Personal Computer", "Microcomputer", "Mainframe", "Laptop"] },
+                { q: "How many bits are in a single byte?", a: "8", options: ["4", "8", "16", "32"] },
+                { q: "How many megabytes (MB) make up one gigabyte (GB)?", a: "1024", options: ["100", "512", "1000", "1024"] },
+                { q: "What is the main circuit board that connects all other components in a computer chassis?", a: "Motherboard", options: ["Motherboard", "Power Supply", "Processor", "Graphics Card"] },
+                { q: "Which motherboard form factor was created by Intel in the 1990s as an enhancement to the older AT design?", a: "ATX", options: ["ITX", "BTX", "ATX", "LPX"] },
+                { q: "Which compact motherboard measures 17 by 17 centimeters and is highly recommended for home theater systems?", a: "Mini ITX", options: ["Micro ATX", "Mini ITX", "Pico BTX", "Flex ATX"] },
+                { q: "Which port is specifically preferred for transmitting large data because it is substantially faster than USB 2.0?", a: "eSATA", options: ["eSATA", "P/S2", "VGA", "Analog Audio"] },
+                { q: "Which video connector features ports that can carry both analog and digital video signals?", a: "DVI", options: ["VGA", "HDMI", "DVI", "DisplayPort"] },
+                { q: "What does HDMI stand for?", a: "High-Definition Multimedia Interface", options: ["High-Data Media Integration", "High-Definition Multimedia Interface", "Hardware Digital Media Input", "Hyper-Definition Monitor Interface"] },
+                { q: "What is the main function of the BIOS during startup?", a: "Provide instructions for the power-on self test (POST)", options: ["Load the web browser", "Provide instructions for the power-on self test (POST)", "Connect to the internet", "Cool the processor"] },
+                { q: "What technology makes up integrated circuits and uses a button battery to retain BIOS settings when the PC is off?", a: "CMOS", options: ["ROM", "CMOS", "NVMe", "SATA"] },
+                { q: "Which specific chipset component links the CPU to very high-speed devices like main memory and graphics controllers?", a: "Northbridge", options: ["Southbridge", "Northbridge", "BIOS", "CMOS"] },
+                { q: "Which chipset component connects to lower-speed peripheral buses like USB and Ethernet?", a: "Southbridge", options: ["Northbridge", "Southbridge", "CPU", "GPU"] },
+                { q: "What CPU architecture uses short, stiff pins arranged in a grid on the underside of the processor?", a: "PGA", options: ["LGA", "Slot 1", "PGA", "BGA"] },
+                { q: "What modern socket type has pins inside the socket that contact flat pads on the bottom of the processor package?", a: "LGA", options: ["LGA", "PGA", "ZIF", "ISA"] },
+                { q: "Which expansion slot specification defines a 32-bit data bus interface widely used by manufacturers?", a: "PCI", options: ["ISA", "PCI", "AGP", "AMR"] },
+                { q: "Which motherboard slot was designed primarily for the acceleration of 3D computer graphics?", a: "AGP", options: ["PCI-E", "AMR", "CNR", "AGP"] },
+                { q: "Which controller is a serial interface standard primarily designed for connecting storage devices like hard disks?", a: "SATA", options: ["SATA", "FDD", "AGP", "PCI"] },
+                { q: "Which front panel connector typically lights up or blinks to indicate storage activity?", a: "HDDLED", options: ["PWRSW", "RESET", "Power LED", "HDDLED"] }
+            ]
+        },
+        {
+            title: "Module 2: Assembly & Disassembly",
+            questions: [
+                { q: "Before disassembling a computer, what should you do to prevent electrostatic discharge (ESD)?", a: "Use an anti-static wrist strap", options: ["Wash your hands", "Use an anti-static wrist strap", "Wear rubber gloves", "Stand on a carpet"] },
+                { q: "How do you drain the flea power (static electricity) from the system unit?", a: "Unplug all cables and hold the power button for 20 seconds", options: ["Unplug all cables and hold the power button for 20 seconds", "Leave the computer plugged in", "Shake the computer gently", "Remove the CMOS battery"] },
+                { q: "What tool is essential for removing most screws in a computer case?", a: "Phillips-head screwdriver", options: ["Pliers", "Flat-head screwdriver", "Phillips-head screwdriver", "Allen wrench"] },
+                { q: "Why is a cooling down period of 15-30 minutes recommended before disassembly?", a: "To allow components to cool and electricity to dissipate", options: ["To allow software to fully close", "To let the internet disconnect", "To allow components to cool and electricity to dissipate", "To save the BIOS settings"] },
+                { q: "If you don't have an anti-static wrist strap, what can you touch to discharge static electricity?", a: "A large metal body like an unpainted radiator", options: ["A plastic bottle", "A large metal body like an unpainted radiator", "A glass window", "A rubber mat"] },
+                { q: "When safely removing RAM modules, what must you do first?", a: "Push the clips on both ends downward", options: ["Pull it straight out with force", "Push the clips on both ends downward", "Unscrew it from the motherboard", "Disconnect its power cable"] },
+                { q: "What secures the CPU in its socket and must be pressed down and pulled slightly to the right to remove it?", a: "A lever", options: ["A screw", "A plastic clip", "A lever", "A magnetic lock"] },
+                { q: "What is the primary purpose of the Power Supply Unit (PSU)?", a: "To regulate power throughout the whole device", options: ["To store permanent data", "To regulate power throughout the whole device", "To cool the processor", "To connect to the internet"] },
+                { q: "Why should you loosen each motherboard screw a little bit before fully unscrewing them?", a: "To prevent warping the motherboard", options: ["To save time", "To prevent warping the motherboard", "To keep the screws from falling", "To avoid scratching the case"] },
+                { q: "What should be used to blow dust off fan blades safely without damaging the motor?", a: "A can of compressed air", options: ["A vacuum cleaner", "A wet cloth", "A can of compressed air", "A hair dryer"] },
+                { q: "Which data cables are used to connect modern hard drives to the motherboard?", a: "SATA cables", options: ["VGA cables", "SATA cables", "Ethernet cables", "Audio cables"] },
+                { q: "What part of the RAM and expansion cards should you NEVER touch if you plan to reuse them?", a: "The gold connectors", options: ["The top edge", "The plastic casing", "The gold connectors", "The cooling fins"] },
+                { q: "When assembling a computer, which component is usually easiest to install on the motherboard BEFORE placing it into the case?", a: "Processor (CPU)", options: ["Power Supply", "Hard Drive", "Processor (CPU)", "Graphics Card"] },
+                { q: "How do you properly align the CPU with the motherboard socket?", a: "Match the golden triangle on the CPU with the similar triangle on the motherboard", options: ["Match the golden triangle on the CPU with the similar triangle on the motherboard", "Push it until it clicks", "Align it with the manufacturer's logo", "It fits in any direction"] },
+                { q: "How much thermal paste should be applied to the processor?", a: "A small dot around the size of a grain of rice or pea", options: ["A thick layer covering the entire surface", "A small dot around the size of a grain of rice or pea", "Two large drops", "None at all"] },
+                { q: "What is a potential risk of adding too much thermal paste?", a: "It creates a mess that may short-circuit components", options: ["The computer runs faster", "The CPU freezes", "It creates a mess that may short-circuit components", "The fan stops spinning"] },
+                { q: "Do all processors require manual application of thermal paste?", a: "No, some stock coolers come with thermal paste pre-applied", options: ["Yes, always", "No, some stock coolers come with thermal paste pre-applied", "No, thermal paste is obsolete", "Only Intel processors need it"] },
+                { q: "Where do the motherboard's back ports fit into the case?", a: "The shielded I/O backplate holes", options: ["The front panel", "The power supply cutout", "The shielded I/O backplate holes", "The expansion slots"] },
+                { q: "Which front panel connector attaches the power button of the case to the motherboard?", a: "PWRSW", options: ["PWRSW", "RESET", "HDDLED", "USB"] },
+                { q: "Graphics cards draw 75W from the PCIe slot, but how is additional power supplied if needed?", a: "6 or 8-pin connectors from the PSU", options: ["6 or 8-pin connectors from the PSU", "24-pin connector from the motherboard", "SATA power cable", "USB cable"] },
+                { q: "The motherboard is connected to the power supply using what type of large connector?", a: "24-pin connector", options: ["4-pin Molex", "8-pin PCIe", "24-pin connector", "SATA data cable"] },
+                { q: "Which storage drive is slotted directly into the motherboard and screwed down to a small post?", a: "M.2 SSD", options: ["3.5\" HDD", "2.5\" SSD", "Optical Drive", "M.2 SSD"] },
+                { q: "During disassembly, what is the very first step after shutting down the computer?", a: "Unplug the power cord and peripheral items", options: ["Remove the motherboard", "Unplug the power cord and peripheral items", "Take out the RAM", "Open the side panel"] },
+                { q: "What mechanism must be gently pulled down or pushed out to unlock a graphics card from its motherboard slot?", a: "The PCIe expansion slot lever", options: ["A thumb screw", "The PCIe expansion slot lever", "The SATA port clip", "The I/O shield"] },
+                { q: "What does HSF stand for in the context of computer assembly?", a: "Heatsink and Fan", options: ["High Speed Fan", "Hardware System Format", "Heatsink and Fan", "Hard Storage File"] }
+            ]
+        },
+        {
+            title: "Module 3: Operating Systems & Setup",
+            questions: [
+                { q: "Which type of operating system processes tasks in groups without direct user interaction?", a: "Batch Operating System", options: ["Real-Time OS", "Multiprogramming OS", "Batch Operating System", "Mobile OS"] },
+                { q: "What type of operating system enables users to run multiple programs concurrently, such as Windows or Linux?", a: "Multitasking Operating System", options: ["Multitasking Operating System", "Batch OS", "Distributed OS", "Single-user OS"] },
+                { q: "Which operating system is specifically designed for applications where timely responses are critical?", a: "Real-Time Operating System (RTOS)", options: ["Distributed OS", "Real-Time Operating System (RTOS)", "Network OS", "Time-sharing OS"] },
+                { q: "What operating system manages a group of independent computers to make them appear as a single system?", a: "Distributed Operating System", options: ["Distributed Operating System", "Network OS", "Batch OS", "Mobile OS"] },
+                { q: "Which feature of Windows 10 Pro allows encryption of the entire local drive?", a: "BitLocker", options: ["Remote Desktop", "Client Hyper-V", "Group Policy", "BitLocker"] },
+                { q: "Which feature is included in Windows 10 Pro but NOT in Windows 10 Home?", a: "Active Directory Integration", options: ["Cortana", "Microsoft Edge", "Active Directory Integration", "Task Manager"] },
+                { q: "When is the end of support for Windows 10 scheduled?", a: "October 14, 2025", options: ["October 14, 2025", "January 1, 2024", "December 31, 2026", "Windows 10 has permanent support"] },
+                { q: "What is the Rufus application primarily used for?", a: "Creating a bootable USB drive", options: ["Editing videos", "Creating a bootable USB drive", "Scanning for viruses", "Defragmenting hard drives"] },
+                { q: "When creating a bootable USB in Rufus for UEFI-only systems, which partition scheme should you select?", a: "GPT", options: ["MBR", "GPT", "FAT32", "NTFS"] },
+                { q: "Which file system is generally selected for Windows installations in Rufus?", a: "NTFS", options: ["FAT16", "exFAT", "ext4", "NTFS"] },
+                { q: "What is the recommended minimum USB drive capacity for creating bootable media?", a: "16GB", options: ["2GB", "4GB", "16GB", "512MB"] },
+                { q: "What official tool from Microsoft is used to create Windows 10 installation media directly?", a: "Media Creation Tool", options: ["Rufus", "Etcher", "UNetbootin", "Media Creation Tool"] },
+                { q: "Which hotkey is commonly used to access the BIOS on HP computers?", a: "F10 or Esc", options: ["F2", "Del", "F10 or Esc", "F1"] },
+                { q: "In the BIOS/UEFI settings, where do you navigate to change the device priority so it boots from USB first?", a: "Boot or Boot Order", options: ["Security", "Advanced", "Power Management", "Boot or Boot Order"] },
+                { q: "If using UEFI, what setting might need to be disabled to allow booting from a third-party USB drive?", a: "Secure Boot", options: ["Fast Boot", "Secure Boot", "Virtualization", "Hyper-Threading"] },
+                { q: "What software allows creating a single USB stick with multiple bootable operating systems?", a: "YUMI or MultiBootUSB", options: ["Rufus", "Media Creation Tool", "YUMI or MultiBootUSB", "Disk Management"] },
+                { q: "What feature allows a Linux live USB to save changes and installed programs even after rebooting?", a: "Persistence", options: ["Virtualization", "Persistence", "Formatting", "Encryption"] },
+                { q: "What does PXE stand for in the context of booting computers over a network?", a: "Preboot Execution Environment", options: ["Primary Execution Engine", "Preboot Execution Environment", "Private XML Encryption", "Protocol Exchange Extension"] },
+                { q: "During Windows Server 2012 R2 setup, what time and currency format is recommended in the module's guide?", a: "English (United Kingdom)", options: ["English (United States)", "English (United Kingdom)", "English (Australia)", "Default System Locale"] },
+                { q: "Which Windows Server 2012 R2 edition is designed for highly virtualized private and hybrid cloud environments?", a: "Datacenter", options: ["Standard", "Essentials", "Foundation", "Datacenter"] },
+                { q: "Which Windows Server 2012 R2 edition is targeted at small businesses with up to 25 users?", a: "Essentials", options: ["Standard", "Datacenter", "Essentials", "Foundation"] },
+                { q: "In a virtual server environment, what key combination is required to send the secure attention sequence (SAS)?", a: "CTRL-ALT-INSERT", options: ["CTRL-ALT-DEL", "CTRL-ALT-INSERT", "SHIFT-TAB-ENTER", "ALT-F4"] },
+                { q: "How do you view detailed network configuration, including the IP address, via the Command Prompt?", a: "ipconfig /all", options: ["ping", "ipconfig /all", "netstat", "tracert"] },
+                { q: "In Windows Server 2012 R2, what tool is primarily used to manage and automate server operations?", a: "Server Manager", options: ["Control Panel", "Task Manager", "Server Manager", "Device Manager"] },
+                { q: "To allow remote desktop connections behind a physical CISCO firewall as per the module's guide, what should you do?", a: "Turn off the firewall for Domain, Private, and Public profiles", options: ["Turn off the firewall for Domain, Private, and Public profiles", "Block all incoming traffic", "Create a new inbound rule for port 80", "Enable Secure Boot"] }
+            ]
+        },
+        {
+            title: "Module 4: Networking Fundamentals",
+            questions: [
+                { q: "What is a system of interconnected devices that allow for communication and sharing of resources?", a: "Network", options: ["Processor", "Network", "Motherboard", "Operating System"] },
+                { q: "Which network type connects devices across a large geographical area, like a city or globally?", a: "Wide Area Network (WAN)", options: ["Local Area Network (LAN)", "Personal Area Network (PAN)", "Wide Area Network (WAN)", "Metropolitan Area Network (MAN)"] },
+                { q: "What network device forwards data packets along networks and connects different networks (e.g., a LAN to an ISP)?", a: "Router", options: ["Switch", "Hub", "Repeater", "Router"] },
+                { q: "What network device operates at the data link layer to filter and forward packets between LAN segments?", a: "Switch", options: ["Router", "Switch", "Hub", "Repeater"] },
+                { q: "Which basic device copies an incoming packet to all other ports so all LAN segments see it?", a: "Hub", options: ["Hub", "Router", "Bridge", "Gateway"] },
+                { q: "What device is used to regenerate or replicate an analog or digital signal distorted by transmission loss?", a: "Repeater", options: ["Switch", "Router", "Repeater", "Firewall"] },
+                { q: "What device connects two local-area networks or segments that use the exact same protocol?", a: "Bridge", options: ["Bridge", "Modem", "Repeater", "Hub"] },
+                { q: "Which protocol enables a computer to communicate with others in the local network?", a: "TCP/IPv4", options: ["HTTP", "TCP/IPv4", "SMTP", "FTP"] },
+                { q: "What is the typical default Subnet Mask used for a small local network (LAN)?", a: "255.255.255.0", options: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.255"] },
+                { q: "What does DHCP stand for?", a: "Dynamic Host Control Protocol", options: ["Dynamic Host Control Protocol", "Digital High Configuration Process", "Data Handling Computer Protocol", "Domain Host Control Panel"] },
+                { q: "Which Windows network location type turns off network discovery to protect against malicious software in open areas?", a: "Public Network", options: ["Home Network", "Work Network", "Domain Network", "Public Network"] },
+                { q: "Which WAN setting is used to obtain an IP address automatically from the Internet Service Provider (ISP)?", a: "Dynamic IP Address", options: ["Static IP Address", "Dynamic IP Address", "PPPoE", "Host Name"] },
+                { q: "What does MAC stand for in MAC Address?", a: "Media Access Control", options: ["Machine Access Code", "Media Access Control", "Main Area Connection", "Memory Allocation Control"] },
+                { q: "What protocol provides a point-to-point connection over Ethernet and requires a username and password from the ISP?", a: "PPPoE", options: ["HTTP", "DHCP", "PPPoE", "DNS"] },
+                { q: "How many bits make up an IPv4 address?", a: "32 bits", options: ["16 bits", "32 bits", "64 bits", "128 bits"] },
+                { q: "How many bits does the newer IPv6 address use?", a: "128 bits", options: ["32 bits", "64 bits", "128 bits", "256 bits"] },
+                { q: "Which network cable transmits data using light signals through thin strands of glass or plastic?", a: "Fiber Optic Cable", options: ["Coaxial Cable", "Unshielded Twisted Pair", "Shielded Twisted Pair", "Fiber Optic Cable"] },
+                { q: "Which Ethernet cable standard is designed for short runs with the highest data network performance?", a: "Cat8", options: ["Cat5e", "Cat6", "Cat7", "Cat8"] },
+                { q: "What type of specialized cable is designed to connect similar devices directly without using a switch or hub?", a: "Crossover Cable", options: ["Crossover Cable", "Straight-through Cable", "Coaxial Cable", "Fiber Optic Cable"] },
+                { q: "What is the standard connector interface used with Ethernet cables?", a: "RJ45", options: ["RJ11", "RJ45", "USB-C", "HDMI"] },
+                { q: "What are the two wiring color-code standards used by RJ45 connectors?", a: "T568A and T568B", options: ["T568A and T568B", "IPv4 and IPv6", "TCP and UDP", "Cat5 and Cat6"] },
+                { q: "What hardware device is used to route circuits for monitoring and testing in a neat, organized compartment?", a: "Patch Panel", options: ["Router", "Switch", "Patch Panel", "Modem"] },
+                { q: "When connecting a patch panel to a modular box, how should the inner wires be arranged?", a: "According to proper color coding (e.g., T568A or T568B)", options: ["Randomly", "By twisting them all together", "According to proper color coding (e.g., T568A or T568B)", "By removing the copper wire"] },
+                { q: "What are the common default username and password for accessing most router web interfaces?", a: "admin/admin", options: ["user/user", "root/toor", "admin/admin", "network/password"] },
+                { q: "How do you perform a factory default reset on a typical router?", a: "Press the reset button with a paperclip for about 15 seconds", options: ["Turn the power off and on quickly", "Press the reset button with a paperclip for about 15 seconds", "Unplug the Ethernet cable", "Change the IP address in Windows"] }
+            ]
+        }
+    ];
+
+    // State Variables
+    let currentModuleIndex = 0;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let hasAnswered = false;
+
+    // DOM Elements
+    const menuScreen = document.getElementById('menu-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const moduleMenu = document.getElementById('module-menu');
+
+    // Initialization
+    function initMenu() {
+        quizData.forEach((module, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.innerHTML = `<span>${module.title}</span> <span>(${module.questions.length} Items)</span>`;
+            btn.onclick = () => startQuiz(index);
+            moduleMenu.appendChild(btn);
+        });
+    }
+
+    function showMenu() {
+        menuScreen.classList.remove('hidden');
+        quizScreen.classList.add('hidden');
+        resultsScreen.classList.add('hidden');
+    }
+
+    function startQuiz(index) {
+        currentModuleIndex = index;
+        currentQuestionIndex = 0;
+        score = 0;
+        
+        menuScreen.classList.add('hidden');
+        resultsScreen.classList.add('hidden');
+        quizScreen.classList.remove('hidden');
+        
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        hasAnswered = false;
+        const module = quizData[currentModuleIndex];
+        const qData = module.questions[currentQuestionIndex];
+        const totalQ = module.questions.length;
+        
+        document.getElementById('module-title').innerText = module.title;
+        document.getElementById('q-current').innerText = currentQuestionIndex + 1;
+        document.getElementById('q-total').innerText = totalQ;
+        document.getElementById('current-score').innerText = score;
+        
+        const progress = (currentQuestionIndex / totalQ) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+
+        document.getElementById('question-text').innerText = `${currentQuestionIndex + 1}. ${qData.q}`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        // Shuffle options for variation
+        const shuffledOptions = [...qData.options].sort(() => Math.random() - 0.5);
+
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, qData.a);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback').className = 'feedback hidden';
+        document.getElementById('next-btn').classList.add('hidden');
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        if (hasAnswered) return;
+        hasAnswered = true;
+
+        const feedback = document.getElementById('feedback');
+        feedback.classList.remove('hidden');
+
+        // Reveal the correct option and disable buttons
+        const allButtons = document.querySelectorAll('.option-btn');
+        allButtons.forEach(b => {
+            b.disabled = true;
+            if (b.innerText === correct) {
+                b.classList.add('correct');
+            }
+        });
+
+        // Determine correctness
+        if (selected === correct) {
+            score++;
+            document.getElementById('current-score').innerText = score;
+            feedback.innerText = "✅ Correct!";
+            feedback.style.backgroundColor = "var(--success-bg)";
+            feedback.style.color = "#14532d";
+        } else {
+            btn.classList.add('wrong');
+            feedback.innerText = `❌ Incorrect. The correct answer is highlighted above.`;
+            feedback.style.backgroundColor = "var(--error-bg)";
+            feedback.style.color = "#7f1d1d";
+        }
+
+        // Advance Progress Bar slightly to reflect the completed question
+        const totalQ = quizData[currentModuleIndex].questions.length;
+        const progress = ((currentQuestionIndex + 1) / totalQ) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+
+        // Update "Next" button text
+        const nextBtn = document.getElementById('next-btn');
+        if (currentQuestionIndex === (totalQ - 1)) {
+            nextBtn.innerHTML = "Finish Module &rarr;";
+        } else {
+            nextBtn.innerHTML = "Next Question &rarr;";
+        }
+        nextBtn.classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        const totalQ = quizData[currentModuleIndex].questions.length;
+        if (currentQuestionIndex < (totalQ - 1)) {
+            currentQuestionIndex++;
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        quizScreen.classList.add('hidden');
+        resultsScreen.classList.remove('hidden');
+        
+        const totalQ = quizData[currentModuleIndex].questions.length;
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('max-score').innerText = `/${totalQ}`;
+        
+        const percentage = (score / totalQ) * 100;
+        const msgElement = document.getElementById('result-message');
+        
+        if (percentage >= 90) { 
+            msgElement.innerText = "Outstanding! You have mastered this module."; 
+            msgElement.style.color = "var(--success)"; 
+        }
+        else if (percentage >= 70) { 
+            msgElement.innerText = "Great job! You have a solid understanding."; 
+            msgElement.style.color = "var(--primary)"; 
+        }
+        else if (percentage >= 50) { 
+            msgElement.innerText = "Good effort! A little more review is needed."; 
+            msgElement.style.color = "#ca8a04"; 
+        }
+        else { 
+            msgElement.innerText = "Keep studying! Review the module and try again."; 
+            msgElement.style.color = "var(--error)"; 
+        }
+    }
+
+    function retryQuiz() {
+        startQuiz(currentModuleIndex);
+    }
+
+    // Initialize the application on load
+    window.onload = initMenu;
+</script>
+
+</body>
+</html>

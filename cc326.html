@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CC326 Ultimate 60-Item Reviewer</title>
+    <style>
+        :root { --primary: #0284c7; --success: #16a34a; --danger: #dc2626; --bg: #f0f9ff; --text: #0f172a; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh; }
+        
+        /* Top Navigation */
+        .top-nav { width: 100%; max-width: 750px; margin-bottom: 20px; }
+        .exit-btn { text-decoration: none; color: #64748b; font-weight: 600; font-size: 0.95rem; transition: 0.2s; }
+        .exit-btn:hover { color: var(--primary); }
+
+        .card { background: white; width: 100%; max-width: 750px; padding: 2.5rem; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h2 { margin: 0; color: var(--primary); font-size: 1.6rem; }
+        
+        .progress-container { font-weight: bold; color: #64748b; font-size: 1.1rem; background: #f1f5f9; padding: 5px 12px; border-radius: 20px; }
+        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+        
+        .category-badge { display: inline-block; background: #e0f2fe; color: var(--primary); padding: 5px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; border: 1px solid #bae6fd; }
+        .question-text { font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+        
+        .enumeration-box { background: #f8fafc; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 20px; border-radius: 0 8px 8px 0; }
+        .enumeration-box ul { margin: 0; padding-left: 20px; color: #334155; line-height: 1.7; font-size: 1.05rem; }
+        .enumeration-box li.missing { color: var(--primary); font-weight: bold; }
+
+        .options { display: grid; gap: 10px; }
+        .option-btn { 
+            padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; 
+            background: white; font-size: 1.05rem; text-align: left; 
+            cursor: pointer; transition: all 0.2s ease; font-weight: 500; color: var(--text);
+        }
+        .option-btn:hover:not(:disabled) { border-color: var(--primary); background: #f0f9ff; transform: translateX(5px); }
+        .option-btn.correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; }
+        .option-btn.wrong { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+
+        .nav-controls { display: flex; gap: 10px; margin-top: 25px; }
+        .prev-btn { 
+            flex: 1; padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; 
+            background: white; color: #64748b; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .prev-btn:hover:not(:disabled) { background: #f8fafc; border-color: #cbd5e1; }
+        .prev-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .next-btn { 
+            flex: 2; padding: 16px; border: none; 
+            border-radius: 10px; background: var(--text); color: white; 
+            font-size: 1.15rem; font-weight: bold; cursor: pointer; display: none; transition: 0.2s;
+        }
+        .next-btn:hover { background: #334155; }
+    </style>
+</head>
+<body>
+
+<div class="top-nav">
+    <a href="index.html" class="exit-btn">← Exit to Main Menu</a>
+</div>
+
+<div class="card" id="quiz-card">
+    <div class="header">
+        <h2>CC326 Reviewer</h2>
+        <div class="progress-container" id="q-counter">1 / 60</div>
+    </div>
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+
+    <div class="category-badge" id="category">Category</div>
+    <div class="question-text" id="question">Loading question...</div>
+    <div id="enum-container"></div>
+    
+    <div class="options" id="options"></div>
+
+    <div class="nav-controls">
+        <button class="prev-btn" id="prev-btn" onclick="prevQuestion()" disabled>← Previous</button>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➔</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { cat: "Fundamentals", q: "The process of planning, designing, and building software to solve business problems.", options: ["Application Development", "Software Engineering", "Systems Design", "Deployment"], answer: "Application Development" },
+        { cat: "Fundamentals", q: "A systematic and managed approach to building complex programs that includes budgeting and scheduling.", options: ["Software Engineering", "Application Development", "Agile Modeling", "SDLC"], answer: "Software Engineering" },
+        { cat: "Software Traits", q: "Key Trait: Software is engineered, not manufactured. Therefore, it does not wear out like physical hardware.", enum: ["Unlike hardware that follows a bathtub curve", "Software fails due to _________"], options: ["latent design flaws", "physical friction", "manufacturing errors", "overheating parts"], answer: "latent design flaws" },
+        { cat: "Software Types", q: "Software mass-produced for many different users (e.g., Microsoft Word).", options: ["Generic Software", "Bespoke Software", "Embedded Software", "System Software"], answer: "Generic Software" },
+        { cat: "Software Types", q: "Software custom-made for a specific client or environment.", options: ["Bespoke Software", "Generic Software", "Embedded Software", "Web-Apps"], answer: "Bespoke Software" },
+        { cat: "Software Types", q: "Programs that help other programs work, like Operating Systems or drivers.", options: ["System Software", "Application Software", "Embedded Software", "AI Software"], answer: "System Software" },
+        { cat: "Software Types", q: "Programs for specific business needs or decision-making.", options: ["Application Software", "System Software", "Embedded Software", "Web-Apps"], answer: "Application Software" },
+        { cat: "Software Types", q: "Software inside a product, like in a car or a microwave, residing in ROM.", options: ["Embedded Software", "AI Software", "Generic Software", "Web-Apps"], answer: "Embedded Software" },
+        { cat: "Software Types", q: "Programs that run over the internet using hypertext files.", options: ["Web-Apps", "AI Software", "Application Software", "System Software"], answer: "Web-Apps" },
+        { cat: "Software Types", q: "Software that uses robotics, expert systems, and pattern recognition.", options: ["AI Software", "Web-Apps", "Embedded Software", "System Software"], answer: "AI Software" },
+        { cat: "Golden Rules", q: "The only reason the software exists is to help the user. Which rule is this?", options: ["Provide Value", "Keep It Simple", "Think of Others", "Plan for Reuse"], answer: "Provide Value" },
+        { cat: "Golden Rules", q: "Designs should be as simple as possible. Which rule is this?", options: ["K.I.S (Keep It Simple)", "THINK", "Think of Others", "Plan for Reuse"], answer: "K.I.S (Keep It Simple)" },
+        { cat: "Golden Rules", q: "Always code and design knowing that someone else will have to read and maintain it later.", options: ["Think of Others", "Provide Value", "Plan for Reuse", "THINK"], answer: "Think of Others" },
+        { cat: "Golden Rules", q: "Design parts that can be used again to save time and money.", options: ["Plan for Reuse", "Provide Value", "K.I.S.", "Think of Others"], answer: "Plan for Reuse" },
+        { cat: "Golden Rules", q: "Always use common sense throughout the process.", options: ["THINK", "Think of Others", "Provide Value", "K.I.S."], answer: "THINK" },
+        { cat: "Process Framework", q: "Provides the foundation for a complete software engineering process by identifying a small number of framework activities.", options: ["Process Framework", "Agile Manifesto", "SDLC", "Umbrella Activities"], answer: "Process Framework" },
+        { cat: "Generic Activities", q: "Which generic activity focuses on understanding the project goals and requirements?", options: ["Communication", "Planning", "Modeling", "Construction"], answer: "Communication" },
+        { cat: "Generic Activities", q: "Which generic activity creates a map of the work, including technical tasks and schedules?", options: ["Planning", "Modeling", "Communication", "Deployment"], answer: "Planning" },
+        { cat: "Generic Activities", q: "Which generic activity involves designing the software through architecture and data structures?", options: ["Modeling", "Construction", "Planning", "Deployment"], answer: "Modeling" },
+        { cat: "Generic Activities", q: "Which generic activity represents the actual coding and testing phase?", options: ["Construction", "Modeling", "Deployment", "Communication"], answer: "Construction" },
+        { cat: "Generic Activities", q: "Which generic activity involves delivering the product to the customer and getting feedback?", options: ["Deployment", "Construction", "Communication", "Planning"], answer: "Deployment" },
+        { cat: "Umbrella Activities", q: "Tasks that happen throughout the entire process to help manage the project.", options: ["Umbrella Activities", "Generic Activities", "SDLC Phases", "Extreme Programming"], answer: "Umbrella Activities" },
+        { cat: "Umbrella Activities", q: "Checking progress against the plan.", options: ["Software Project Tracking & Control", "Risk Management", "Technical Reviews", "SQA"], answer: "Software Project Tracking & Control" },
+        { cat: "Umbrella Activities", q: "Identifying and dealing with things that might go wrong.", options: ["Risk Management", "SQA", "Technical Reviews", "Project Tracking"], answer: "Risk Management" },
+        { cat: "Umbrella Activities", q: "Ensuring the software meets its standards.", options: ["Software Quality Assurance (SQA)", "Risk Management", "Technical Reviews", "Project Tracking"], answer: "Software Quality Assurance (SQA)" },
+        { cat: "Umbrella Activities", q: "Checking for errors early in the process.", options: ["Technical Reviews", "SQA", "Risk Management", "Project Tracking"], answer: "Technical Reviews" },
+        { cat: "Process Models", q: "A linear, step-by-step approach where each phase must be finished before moving to the next.", options: ["The Waterfall Model", "Incremental Model", "Prototyping Model", "Spiral Model"], answer: "The Waterfall Model" },
+        { cat: "Process Models", q: "What is the main problem with the Waterfall Model?", options: ["Hard to handle changes once started", "Too focused on risk", "Requires too much communication", "Delivers working software too fast"], answer: "Hard to handle changes once started" },
+        { cat: "Process Models", q: "The software is developed in small pieces, where the first piece is the 'core product'.", options: ["Incremental Process Model", "Waterfall Model", "Prototyping Model", "Spiral Model"], answer: "Incremental Process Model" },
+        { cat: "Process Models", q: "Used when requirements are unclear, making a 'quick design' to create a mockup for the user.", options: ["Prototyping Model", "Spiral Model", "Concurrent Model", "Waterfall Model"], answer: "Prototyping Model" },
+        { cat: "Process Models", q: "An iterative approach that focuses heavily on risk assessment and moves in a circle.", options: ["Spiral Model", "Prototyping Model", "Concurrent Model", "Incremental Model"], answer: "Spiral Model" },
+        { cat: "Process Models", q: "Allows different teams to work on different stages of the project at the same time.", options: ["Concurrent Model", "Spiral Model", "Waterfall Model", "Incremental Model"], answer: "Concurrent Model" },
+        { cat: "Agility", q: "A philosophy of software engineering that emphasizes continuous delivery of working software.", options: ["Agility", "Extreme Programming", "System Design", "Quality Assurance"], answer: "Agility" },
+        { cat: "Agility", q: "What are the key traits of Agility?", options: ["Iterative and Incremental", "Linear and Step-by-step", "Risk-focused and Circular", "Abstract and Physical"], answer: "Iterative and Incremental" },
+        { cat: "Agile Manifesto", q: "Identify the missing Agile Value:", enum: ["1. Working Software over comprehensive documentation", "2. Customer Collaboration over contract negotiation", "3. Responding to Change over following a set plan", "4. ________ over processes and tools"], options: ["Individuals and Interactions", "Systems and Architecture", "Management and Budgeting", "Testing and Deployment"], answer: "Individuals and Interactions" },
+        { cat: "Agile Manifesto", q: "Working Software is valued over ________.", options: ["comprehensive documentation", "following a set plan", "contract negotiation", "processes and tools"], answer: "comprehensive documentation" },
+        { cat: "Agile Manifesto", q: "Customer Collaboration is valued over ________.", options: ["contract negotiation", "following a set plan", "comprehensive documentation", "processes and tools"], answer: "contract negotiation" },
+        { cat: "Agile Manifesto", q: "Responding to Change is valued over ________.", options: ["following a set plan", "contract negotiation", "comprehensive documentation", "processes and tools"], answer: "following a set plan" },
+        { cat: "Agile Principles", q: "The highest priority is to satisfy the customer through early and continuous delivery of valuable software.", options: ["Customer Satisfaction", "Welcome Change", "Simplicity", "Self-Organizing Teams"], answer: "Customer Satisfaction" },
+        { cat: "Agile Principles", q: "The art of maximizing the amount of work NOT done is essential.", options: ["Simplicity", "Welcome Change", "Customer Satisfaction", "Self-Organizing Teams"], answer: "Simplicity" },
+        { cat: "Agile Principles", q: "The best architectures and designs emerge from teams that manage themselves.", options: ["Self-Organizing Teams", "Competence", "Common Purpose", "Collaboration"], answer: "Self-Organizing Teams" },
+        { cat: "Agile Human Factors", q: "For an Agile project to succeed, everyone must be focused on the same goal. This is called:", options: ["Common Purpose", "Competence", "Collaboration", "Mutual Trust"], answer: "Common Purpose" },
+        { cat: "Agile Human Factors", q: "Valuing each team member's contribution is known as:", options: ["Mutual Trust and Respect", "Collaboration", "Competence", "Common Purpose"], answer: "Mutual Trust and Respect" },
+        { cat: "Extreme Programming", q: "XP Planning starts with ________ where the customer describes what they need.", options: ["User Stories", "KISS Principle", "Pair Programming", "Testing"], answer: "User Stories" },
+        { cat: "Extreme Programming", q: "XP Design follows which core principle?", options: ["KISS (Keep It Simple, Stupid!)", "User Stories", "Pair Programming", "Risk Assessment"], answer: "KISS (Keep It Simple, Stupid!)" },
+        { cat: "Extreme Programming", q: "XP Coding encourages ________ where two people work at one computer.", options: ["Pair Programming", "Concurrent Modeling", "User Stories", "Self-Organizing"], answer: "Pair Programming" },
+        { cat: "Extreme Programming", q: "In XP Testing, when are tests created?", options: ["Before the code is written", "After deployment", "During technical reviews", "During risk management"], answer: "Before the code is written" },
+        { cat: "SE Practice", q: "The main objective of Software Engineering Practice is to deliver high-quality, operational software on a schedule that meets:", options: ["the customer's requirements", "the budget constraints", "the bathtub curve", "the theoretical framework"], answer: "the customer's requirements" },
+        { cat: "Practice Principles", q: "Large, complex problems are easier to solve if they are broken down into smaller, manageable pieces.", options: ["Divide and Conquer", "Understand Abstraction", "Strive for Consistency", "Focus on Information Transfer"], answer: "Divide and Conquer" },
+        { cat: "Practice Principles", q: "Focus on the essential details while temporarily hiding complex implementation parts.", options: ["Understand Abstraction", "Divide and Conquer", "Strive for Consistency", "Focus on Information Transfer"], answer: "Understand Abstraction" },
+        { cat: "Communication", q: "Pay close attention to the customer's needs instead of making assumptions.", options: ["Listen", "Prepare Before You Communicate", "Facilitate the Activity", "Face-to-Face is Best"], answer: "Listen" },
+        { cat: "Communication", q: "Personal interaction is the most effective way to avoid misinterpretation.", options: ["Face-to-Face is Best", "Listen", "Facilitate the Activity", "Prepare Before You Communicate"], answer: "Face-to-Face is Best" },
+        { cat: "Modeling Principles", q: "Create a 'blueprint' of the software that is traceable back to the original requirements.", options: ["Design Modeling", "Analysis Modeling", "Planning", "Validation"], answer: "Design Modeling" },
+        { cat: "Construction", q: "Use structured programming practices to ensure the code is easy to read and maintain.", options: ["Coding", "Validation", "Deployment", "Testing"], answer: "Coding" },
+        { cat: "Deployment", q: "Manage user expectations by not promising features that cannot be delivered immediately.", options: ["Deployment", "Validation", "Coding", "Maintenance"], answer: "Deployment" },
+        { cat: "Systems Design", q: "Abstract Flow: How data moves through the system without considering hardware.", options: ["Logical Design", "Physical Design", "Generic Design", "Bespoke Design"], answer: "Logical Design" },
+        { cat: "Systems Design", q: "Concrete Implementation: The actual UI, input/output processes, and hardware requirements.", options: ["Physical Design", "Logical Design", "Embedded Design", "System Design"], answer: "Physical Design" },
+        { cat: "SDLC", q: "The rigorous process of identifying defects and ensuring the software meets requirements.", enum: ["1. Requirement Gathering", "2. System Design", "3. Implementation", "4. ________", "5. Deployment", "6. Maintenance"], options: ["Testing", "Modeling", "Construction", "Validation"], answer: "Testing" },
+        { cat: "Professional Design", q: "Good design uses modular components that can be used in future projects.", options: ["Plan ahead for reuse", "What you produce, others will consume", "Keep it Simple", "Be open to the future"], answer: "Plan ahead for reuse" },
+        { cat: "Soft Skills", q: "In Problem Solving Methodology, you cannot solve a problem you don't understand. What is the first and most vital step?", options: ["Understanding the Problem", "Communication Hierarchy", "The THINK Core", "Face-to-face interaction"], answer: "Understanding the Problem" }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    let shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+
+    function loadQuestion() {
+        const data = shuffledQuestions[currentIdx];
+        document.getElementById('q-counter').innerText = `${currentIdx + 1} / ${shuffledQuestions.length}`;
+        document.getElementById('progress-fill').style.width = `${(currentIdx / shuffledQuestions.length) * 100}%`;
+        document.getElementById('category').innerText = data.cat;
+        document.getElementById('question').innerText = data.q;
+        document.getElementById('prev-btn').disabled = currentIdx === 0;
+
+        const enumContainer = document.getElementById('enum-container');
+        if (data.enum) {
+            let listHTML = "";
+            data.enum.forEach(item => {
+                listHTML += item.includes("________") ? `<li class="missing">${item}</li>` : `<li>${item}</li>`;
+            });
+            enumContainer.innerHTML = `<div class="enumeration-box"><ul>${listHTML}</ul></div>`;
+        } else {
+            enumContainer.innerHTML = "";
+        }
+
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = "";
+        
+        // Generate options (deterministic shuffle based on question to stay consistent if going back)
+        let displayOptions = [...data.options].sort(); 
+        
+        displayOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn, data.answer);
+            
+            // If user already answered, show the result
+            if(userAnswers[currentIdx] !== null) {
+                btn.disabled = true;
+                if(opt === data.answer) btn.classList.add('correct');
+                if(opt === userAnswers[currentIdx] && opt !== data.answer) btn.classList.add('wrong');
+                document.getElementById('next-btn').style.display = "block";
+            } else {
+                document.getElementById('next-btn').style.display = "none";
+            }
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btn, correct) {
+        userAnswers[currentIdx] = selected;
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            allBtns.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+        }
+        document.getElementById('next-btn').style.display = "block";
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < shuffledQuestions.length) {
+            loadQuestion();
+        } else {
+            showFinal();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentIdx > 0) {
+            // If they are going back and had a correct answer, decrement score to prevent farming points
+            if(userAnswers[currentIdx] === shuffledQuestions[currentIdx].answer) {
+                score--;
+            }
+            currentIdx--;
+            loadQuestion();
+        }
+    }
+
+    function showFinal() {
+        document.getElementById('progress-fill').style.width = "100%";
+        const percentage = (score / shuffledQuestions.length) * 100;
+        let message = percentage >= 90 ? "Elite level!" : percentage >= 75 ? "Great job!" : "Good practice run.";
+
+        document.getElementById('quiz-card').innerHTML = `
+            <div style="text-align:center; padding: 2rem 0;">
+                <div style="font-size: 5rem; margin-bottom: 20px;">🎓</div>
+                <h2 style="color: var(--primary); font-size: 2rem; margin-bottom: 10px;">Review Complete!</h2>
+                <p style="font-size: 1.5rem; margin-bottom: 10px;">Your Score: <strong>${score} / ${shuffledQuestions.length}</strong></p>
+                <p style="font-size: 1.1rem; color: #64748b; margin-bottom: 30px;">${message}</p>
+                <button class="next-btn" style="display:block; background: var(--primary); width: 100%;" onclick="location.reload()">Take Again</button>
+            </div>
+        `;
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
