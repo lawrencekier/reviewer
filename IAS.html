@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAS321: Information Assurance and Security 1 Reviewer</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --accent: #3b82f6;
+            --success: #16a34a;
+            --error: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        h1, h2 { text-align: center; color: var(--primary); }
+        .subtitle { text-align: center; color: var(--muted); margin-bottom: 30px; }
+        
+        .hidden { display: none !important; }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: var(--accent);
+            color: white;
+            text-align: left;
+        }
+
+        .menu-grid button { text-align: center; }
+
+        button:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn-secondary { background: var(--muted); text-align: center; }
+        .btn-secondary:hover { background: #475569; }
+        .btn-next { text-align: center; }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: var(--muted);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            background: #f1f5f9;
+            color: var(--text);
+            border: 2px solid transparent;
+            margin-bottom: 12px;
+        }
+
+        .option-btn:hover:not(:disabled) { background: #e2e8f0; }
+        .option-btn:disabled { cursor: default; }
+
+        .option-btn.correct { background: #dcfce7 !important; border-color: var(--success); color: #14532d; }
+        .option-btn.wrong { background: #fee2e2 !important; border-color: var(--error); color: #7f1d1d; }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 15px;
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px 15px;
+                border-radius: 8px;
+            }
+
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.25rem; }
+            .subtitle { font-size: 0.9rem; margin-bottom: 20px; }
+
+            button {
+                padding: 14px 15px; /* Better touch targets for mobile */
+                font-size: 15px;
+            }
+
+            .stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.95rem;
+                padding-bottom: 10px;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+
+            .nav-controls {
+                flex-direction: column-reverse; /* Puts "Next" button on top on mobile */
+            }
+
+            .nav-controls button {
+                width: 100%;
+            }
+            
+            #results-screen div {
+                font-size: 3rem !important; /* Scale down the huge score text on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="menu-screen">
+        <h1>IAS321: 100-Item Reviewer</h1>
+        <p class="subtitle">Select a module to begin (25 Questions each)</p>
+        <div class="menu-grid">
+            <button onclick="startQuiz(0)">Module 1: Intro to Information Security (17 Items)</button>
+            <button onclick="startQuiz(1)">Module 2: The Need for Security (17 Items)</button>
+            <button onclick="startQuiz(2)">Module 3: Legal, Ethical & Professional (17 Items)</button>
+            <button onclick="startQuiz(3)">Module 4: Risk Management (16 Items)</button>
+            <button onclick="startQuiz(4)">Module 5: Planning for Security (16 Items)</button>
+            <button onclick="startQuiz(5)">Module 6: Firewalls and VPNs (17 Items)</button>
+        </div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <h2 id="module-title">Module Title</h2>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div class="stats">
+            <span>Question <span id="q-current">1</span> of <span id="q-total">17</span></span>
+            <span>Score: <span id="current-score">0</span></span>
+        </div>
+        
+        <div id="question-text" class="question-text"></div>
+        <div id="options-container"></div>
+        <div id="feedback" class="feedback hidden"></div>
+        
+        <div class="nav-controls">
+            <button class="btn-secondary" onclick="showMenu()">Exit to Menu</button>
+            <button id="next-btn" class="btn-next hidden" onclick="nextQuestion()">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <div id="results-screen" class="hidden">
+        <h2>Module Completed!</h2>
+        <div style="text-align: center; font-size: 4rem; font-weight: bold; color: var(--accent); margin: 20px 0;">
+            <span id="final-score">0</span><span style="font-size: 2rem; color: var(--muted)" id="max-score-display">/17</span>
+        </div>
+        <p id="result-message" style="text-align: center; font-size: 1.2rem; margin-bottom: 30px; font-weight: bold;"></p>
+        <div class="menu-grid">
+            <button onclick="retryQuiz()" style="text-align: center;">Retry Module</button>
+            <button class="btn-secondary" onclick="showMenu()">Back to Main Menu</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            title: "Module 1: Introduction to Information Security",
+            questions: [
+                { q: "What does the acronym ARPA stand for?", a: "Advanced Research Project Agency", options: ["Advanced Research Protocol Association", "Automated Routing and Parsing Application", "Advanced Research Project Agency", "American Research Processing Agency"] },
+                { q: "Who is dubbed the 'Father of the Internet' for his work developing ARPANET?", a: "Larry Roberts", options: ["Bob Metcalfe", "Larry Roberts", "Dennis Ritchie", "Ken Thompson"] },
+                { q: "Which 1960s operating system was notable for integrating security into its basic functions?", a: "MULTICS", options: ["UNIX", "Windows NT", "MULTICS", "Linux"] },
+                { q: "What report kick-started the field of computer security research in the late 1960s?", a: "Rand Report R-609", options: ["ARPANET Program Plan", "The Enigma Report", "Rand Report R-609", "DoD Security Matrix"] },
+                { q: "What are the three components of the C.I.A. triangle?", a: "Confidentiality, Integrity, Availability", options: ["Control, Identification, Authentication", "Confidentiality, Integrity, Availability", "Computing, Internet, Access", "Cybersecurity, Information, Assurance"] },
+                { q: "Which term refers to the ability of a subject or thing to manipulate, modify, or influence another subject or object?", a: "Access", options: ["Asset", "Vulnerability", "Access", "Control"] },
+                { q: "What is an 'Asset' in the context of information security?", a: "The resource that is being safeguarded within the organization.", options: ["A weakness in a system.", "An act that harms the system.", "The resource that is being safeguarded within the organization.", "A rule for countering an assault."] },
+                { q: "A flaw or weakness in a system or defense mechanism is known as a:", a: "Vulnerability", options: ["Threat", "Vulnerability", "Exploit", "Risk"] },
+                { q: "Which term refers to an act that can harm or compromise information and/or systems?", a: "Attack", options: ["Exposure", "Loss", "Attack", "Asset"] },
+                { q: "When information is safeguarded from disclosure or exposure to unauthorized individuals, it possesses:", a: "Confidentiality", options: ["Availability", "Confidentiality", "Integrity", "Utility"] },
+                { q: "When information is whole, complete, and uncorrupted, it is said to have:", a: "Integrity", options: ["Accuracy", "Integrity", "Confidentiality", "Availability"] },
+                { q: "Which characteristic permits authorized users to access information without interference?", a: "Availability", options: ["Integrity", "Availability", "Authorization", "Access Control"] },
+                { q: "A specific instance or component of a threat (e.g., Kevin Mitnick or a specific tornado) is called a:", a: "Threat Agent", options: ["Vulnerability", "Threat Agent", "Exploit", "Target Entity"] },
+                { q: "Which of the following is an example of an indirect attack?", a: "A hacker compromising a system and using it as part of a botnet to attack other systems.", options: ["A hacker directly breaking into a database.", "A lightning strike causing a fire.", "A hacker compromising a system and using it as part of a botnet to attack other systems.", "An employee casually reading a sensitive email over someone's shoulder."] },
+                { q: "What does CNSS stand for in the context of information security definitions?", a: "Committee on National Security Systems", options: ["Center for Network Security Standards", "Committee on National Security Systems", "Council of Network Security Services", "Computer Network Systems Security"] },
+                { q: "The history of information security began primarily with the need to protect what devices during World War II?", a: "Mainframes used for code breaking", options: ["Personal Computers", "Cloud Servers", "Mainframes used for code breaking", "Mobile Phones"] },
+                { q: "Who invented Ethernet and identified major flaws in ARPANET security in 1978?", a: "Robert M. 'Bob' Metcalfe", options: ["Larry Roberts", "Dennis Ritchie", "Robert M. 'Bob' Metcalfe", "Doug McIlroy"] }
+            ]
+        },
+        {
+            title: "Module 2: The Need for Security",
+            questions: [
+                { q: "Which of the following is NOT one of the four important functions of information security for an organization?", a: "Generating maximum profit for the IT department", options: ["Protecting the organization’s ability to function", "Enabling the safe operation of applications", "Safeguarding the organization’s technology assets", "Generating maximum profit for the IT department"] },
+                { q: "What term describes the ownership of ideas and control over the tangible or virtual representation of those ideas?", a: "Intellectual Property", options: ["Corporate Governance", "Intellectual Property", "Open Source Data", "Public Domain"] },
+                { q: "A computer program that attaches itself to an existing program and uses the cell's own replication machinery is called a:", a: "Virus", options: ["Worm", "Trojan Horse", "Virus", "Logic Bomb"] },
+                { q: "A malicious program that replicates constantly without requiring another program environment is called a:", a: "Worm", options: ["Virus", "Worm", "Back Door", "Spyware"] },
+                { q: "Software programs that hide their true nature and reveal their designed behavior only when activated are known as:", a: "Trojan Horses", options: ["Polymorphic Threats", "Trojan Horses", "Worms", "Sniffers"] },
+                { q: "What is a polymorphic threat?", a: "A threat that changes the way it appears over time to evade antivirus software.", options: ["A virus that attacks multiple operating systems simultaneously.", "A threat that changes the way it appears over time to evade antivirus software.", "A physical threat like an earthquake.", "An attack that uses social engineering and hacking combined."] },
+                { q: "The classic perpetrator of espionage or trespass is the:", a: "Hacker", options: ["Phreaker", "Script Kiddie", "Hacker", "Cracker"] },
+                { q: "Individuals who remove software protection designed to prevent unauthorized duplication are known as:", a: "Crackers", options: ["Phreakers", "Hackers", "Crackers", "Botnets"] },
+                { q: "Which category of threat includes events such as fires, floods, earthquakes, and lightning?", a: "Forces of Nature", options: ["Human Error", "Sabotage or Vandalism", "Technical Hardware Failures", "Forces of Nature"] },
+                { q: "An attack that sends a large number of requests to a target so that it becomes overloaded and cannot respond is called:", a: "Denial-of-Service (DoS)", options: ["Spoofing", "Denial-of-Service (DoS)", "Man-in-the-Middle", "Dictionary Attack"] },
+                { q: "What does DDoS stand for?", a: "Distributed Denial-of-Service", options: ["Direct Denial-of-Service", "Distributed Denial-of-Service", "Data Destruction of System", "Dynamic Denial-of-Security"] },
+                { q: "A technique used to gain unauthorized access by forging a source IP address to look like a trusted host is called:", a: "Spoofing", options: ["Spamming", "Phishing", "Spoofing", "Sniffing"] },
+                { q: "The man-in-the-middle attack is also known as:", a: "TCP hijacking", options: ["TCP hijacking", "IP spoofing", "Mail bombing", "Pharming"] },
+                { q: "Using social skills to convince people to reveal access credentials or valuable information is known as:", a: "Social Engineering", options: ["Brute Force", "Social Engineering", "Phishing", "Espionage"] },
+                { q: "An attempt to gain personal or financial information by posing as a legitimate entity (e.g., via email) is called:", a: "Phishing", options: ["Phishing", "Pharming", "Spoofing", "Cracking"] },
+                { q: "The redirection of legitimate Web traffic to an illegitimate site using Trojans or worms is known as:", a: "Pharming", options: ["Phishing", "Spear Phishing", "Pharming", "Sniffing"] },
+                { q: "What is an automated software program that executes certain commands when it receives specific input?", a: "Bot", options: ["Bot", "Virus", "Worm", "Sniffer"] }
+            ]
+        },
+        {
+            title: "Module 3: Legal, Ethical & Professional Issues",
+            questions: [
+                { q: "What is the key difference between laws and ethics?", a: "Laws carry the authority of a governing body, while ethics do not.", options: ["Ethics carry the authority of a governing body, while laws do not.", "Laws carry the authority of a governing body, while ethics do not.", "Laws only apply to businesses, while ethics apply to individuals.", "There is no difference; the terms are interchangeable."] },
+                { q: "What term describes a legal obligation of an entity that extends beyond criminal or contract law?", a: "Liability", options: ["Due Care", "Due Diligence", "Liability", "Jurisdiction"] },
+                { q: "Which principle requires that an organization makes a valid effort to protect others and continually maintains this effort?", a: "Due diligence", options: ["Due care", "Liability", "Jurisdiction", "Due diligence"] },
+                { q: "Unlike a law, what is an acceptable defense regarding an organizational policy?", a: "Ignorance of the policy", options: ["Ignorance of the policy", "Financial hardship", "Lack of technical skills", "Cultural differences"] },
+                { q: "Which of the following is NOT one of the five criteria for a policy to be enforceable?", a: "Government ratification", options: ["Dissemination", "Comprehension", "Uniform enforcement", "Government ratification"] },
+                { q: "Which US Act is considered the cornerstone of many computer-related federal laws and enforcement efforts?", a: "The Computer Fraud and Abuse Act of 1986", options: ["The Privacy Act of 1974", "The Computer Fraud and Abuse Act of 1986", "The Electronic Communications Privacy Act", "HIPAA"] },
+                { q: "Which US law protects the confidentiality and security of health care data?", a: "HIPAA", options: ["CFA Act", "Privacy Act of 1974", "HIPAA", "Federal Trade Commission Act"] },
+                { q: "Information created by combining pieces of non-private data that may eventually violate privacy is called:", a: "Aggregate information", options: ["Proprietary data", "Aggregate information", "Classified data", "Public domain information"] },
+                { q: "When someone uses your personally identifying information without permission to commit fraud, it is called:", a: "Identity Theft", options: ["Phishing", "Identity Theft", "Espionage", "Cyberstalking"] },
+                { q: "Which of the following is NOT a general cause of unethical and illegal behavior?", a: "Generosity", options: ["Ignorance", "Accident", "Intent", "Generosity"] },
+                { q: "Penalties will only deter illegal behavior if three conditions are present: fear of penalty, probability of being caught, and:", a: "Probability of penalty being administered", options: ["High financial fines", "Probability of penalty being administered", "Public embarrassment", "A written warning"] },
+                { q: "Which professional organization is known as the 'World’s first educational and scientific computing society'?", a: "Association of Computing Machinery (ACM)", options: ["ISACA", "ISSA", "ISC2", "Association of Computing Machinery (ACM)"] },
+                { q: "Republic Act 10173 in the Philippines is also known as the:", a: "Data Privacy Act of 2012", options: ["Cybercrime Prevention Act", "Data Privacy Act of 2012", "Anti-Graft and Corrupt Practices Act", "E-Commerce Act"] },
+                { q: "Which individual right allows a data subject to move their personal data from one IT environment to another?", a: "The right to data portability", options: ["The right to be informed", "The right to object", "The right to data portability", "The right to damages"] },
+                { q: "Which type of law regulates the relationship between individuals and organizations, encompassing family and labor laws?", a: "Private Law", options: ["Criminal Law", "Public Law", "Private Law", "Civil Law"] },
+                { q: "Which type of law addresses activities and conduct harmful to the public?", a: "Criminal Law", options: ["Civil Law", "Criminal Law", "Private Law", "Constitutional Law"] },
+                { q: "What does 'Due care' ensure within an organization?", a: "Every employee knows what is acceptable and the consequences of illegal actions.", options: ["Every employee gets a bonus.", "The company pays its taxes on time.", "Every employee knows what is acceptable and the consequences of illegal actions.", "The company files lawsuits against hackers."] }
+            ]
+        },
+        {
+            title: "Module 4: Risk Management",
+            questions: [
+                { q: "What is Risk Management?", a: "The process of identifying risk and taking steps to reduce it to an acceptable level.", options: ["The process of eliminating all threats.", "The process of identifying risk and taking steps to reduce it to an acceptable level.", "The process of buying insurance.", "The process of firing employees who make mistakes."] },
+                { q: "What are the three major undertakings of risk management?", a: "Risk identification, risk assessment, and risk control.", options: ["Risk denial, risk acceptance, and risk ignoring.", "Risk identification, risk assessment, and risk control.", "Planning, Detection, Reaction.", "Identification, Authentication, Authorization."] },
+                { q: "When identifying Data Assets, which attribute is important to track?", a: "Classification, owner, and location", options: ["MAC Address", "Classification, owner, and location", "Hardware serial number", "Network port speed"] },
+                { q: "A typical corporate information classification scheme uses which three categories?", a: "Confidential, Internal, External", options: ["Top Secret, Secret, Public", "Confidential, Internal, External", "High Risk, Medium Risk, Low Risk", "Private, Public, Classified"] },
+                { q: "In the military classification scheme, what is the highest level of classification?", a: "Top Secret", options: ["Confidential", "Secret", "Top Secret", "Classified"] },
+                { q: "In risk assessment, what defines 'Likelihood'?", a: "The probability that a specific vulnerability will be the object of a successful attack.", options: ["The amount of money lost in an attack.", "The probability that a specific vulnerability will be the object of a successful attack.", "The percentage of data recovered after a disaster.", "The number of hackers in the world."] },
+                { q: "What is 'Residual risk'?", a: "The risk to the information asset that remains even after the application of controls.", options: ["The risk eliminated by a firewall.", "The initial risk before any controls are applied.", "The risk to the information asset that remains even after the application of controls.", "The cost of repairing hardware."] },
+                { q: "Which risk control strategy attempts to prevent the exploitation of a vulnerability (e.g., applying policy and technology)?", a: "Defend", options: ["Transfer", "Mitigate", "Defend", "Accept"] },
+                { q: "Which risk control strategy attempts to shift risk to other processes or organizations (e.g., purchasing insurance)?", a: "Transfer", options: ["Defend", "Transfer", "Terminate", "Accept"] },
+                { q: "Which risk control strategy attempts to reduce the impact of an exploited vulnerability through planning (like an Incident Response Plan)?", a: "Mitigate", options: ["Mitigate", "Transfer", "Accept", "Defend"] },
+                { q: "Which risk control strategy is the choice to do nothing to protect a vulnerability and face the consequences?", a: "Accept", options: ["Terminate", "Mitigate", "Accept", "Transfer"] },
+                { q: "Which risk control strategy directs the organization to avoid business activities that introduce uncontrollable risks?", a: "Terminate", options: ["Defend", "Transfer", "Terminate", "Mitigate"] },
+                { q: "In Cost Benefit Analysis, what does SLE stand for?", a: "Single Loss Expectancy", options: ["System Log Error", "Single Loss Expectancy", "Standard Loss Estimate", "Secure Layer Encryption"] },
+                { q: "How is Annual Loss Expectancy (ALE) calculated?", a: "SLE x ARO", options: ["AV x EF", "SLE x EF", "SLE x ARO", "ARO / SLE"] },
+                { q: "What does Exposure Factor (EF) represent?", a: "The proportion of an asset’s value that is likely to be destroyed by a particular risk.", options: ["The number of times a risk occurs in a year.", "The proportion of an asset’s value that is likely to be destroyed by a particular risk.", "The monetary value of an asset.", "The probability of a lightning strike."] },
+                { q: "What does ARO (Average Rate of Occurrence) define?", a: "The probability that an exploitation of a risk will occur within a year.", options: ["The expected monetary loss.", "The proportion of an asset destroyed.", "The probability that an exploitation of a risk will occur within a year.", "The cost of buying insurance."] }
+            ]
+        },
+        {
+            title: "Module 5: Planning for Security",
+            questions: [
+                { q: "Which type of planning sets out the long-term direction to be taken by the whole organization?", a: "Strategic planning", options: ["Tactical planning", "Strategic planning", "Operational planning", "Contingency planning"] },
+                { q: "Which type of planning focuses on shorter-term undertakings that will be completed within one or two years?", a: "Tactical planning", options: ["Strategic planning", "Operational planning", "Tactical planning", "Emergency planning"] },
+                { q: "What serves as 'organizational laws' by dictating acceptable and unacceptable behavior within the organization?", a: "Policies", options: ["Standards", "Practices", "Policies", "Guidelines"] },
+                { q: "What are more detailed statements of what must be done to comply with an organizational policy?", a: "Standards", options: ["Policies", "Standards", "Visions", "Missions"] },
+                { q: "The executive level document that sets the strategic direction, scope, and tone for all security efforts is the:", a: "Enterprise Information Security Policy (EISP)", options: ["Issue-Specific Security Policy (ISSP)", "Systems-Specific Policy (SysSP)", "Enterprise Information Security Policy (EISP)", "Disaster Recovery Plan (DRP)"] },
+                { q: "Which policy addresses specific areas of technology, requires frequent updates, and covers things like internet/email use?", a: "Issue-Specific Security Policy (ISSP)", options: ["EISP", "Issue-Specific Security Policy (ISSP)", "SysSP", "Contingency Plan"] },
+                { q: "Access Control Lists (ACLs) and Configuration rules fall under which category of policy?", a: "Systems-Specific Policy (SysSP)", options: ["EISP", "ISSP", "Systems-Specific Policy (SysSP)", "Business Continuity Plan"] },
+                { q: "Who is typically responsible for the creation, revision, distribution, and storage of a policy?", a: "The policy administrator", options: ["The CEO", "The end user", "The system hacker", "The policy administrator"] },
+                { q: "For a policy to be legally enforceable, which criterion demonstrates that the employee agreed to comply?", a: "Compliance (agreement)", options: ["Dissemination", "Review", "Compliance (agreement)", "Uniform enforcement"] },
+                { q: "What international standard adopted in 2000 gives recommendations for information security management?", a: "ISO/IEC 17799 (later ISO 27002)", options: ["IEEE 802.11", "ISO 9001", "ISO/IEC 17799 (later ISO 27002)", "RFC 1918"] },
+                { q: "Which plan addresses the identification, classification, response, and recovery from a cyber attack or security event?", a: "Incident Response (IR) plan", options: ["Disaster Recovery (DR) plan", "Business Continuity (BC) plan", "Incident Response (IR) plan", "Strategic plan"] },
+                { q: "Which plan addresses the preparation for and recovery from a disaster, whether natural or man-made?", a: "Disaster Recovery (DR) plan", options: ["Incident Response plan", "Disaster Recovery (DR) plan", "Business Continuity plan", "Tactical plan"] },
+                { q: "Which plan ensures that critical business functions continue at an alternate site if a catastrophic incident occurs?", a: "Business Continuity (BC) plan", options: ["Incident Response plan", "Business Continuity (BC) plan", "Disaster Recovery plan", "Issue-Specific Policy"] },
+                { q: "The actions taken during and after a disaster that focus primarily on the people involved are referred to as:", a: "Crisis management", options: ["Incident detection", "Incident reaction", "Crisis management", "Policy administration"] },
+                { q: "Which of the following is a definite incident indicator?", a: "Users report corrupt data files (Loss of integrity)", options: ["The internet runs slightly slower than usual.", "A user forgets their password.", "Users report corrupt data files (Loss of integrity)", "An employee gets promoted."] },
+                { q: "What framework from Carnegie Mellon University is recommended for implementing information security governance?", a: "IDEAL framework", options: ["Agile framework", "Scrum framework", "IDEAL framework", "Waterfall framework"] }
+            ]
+        },
+        {
+            title: "Module 6: Security Technology - Firewalls and VPNs",
+            questions: [
+                { q: "Which access control method uses data classification schemes, giving limited control to users based on sensitivity levels?", a: "Mandatory Access Control (MAC)", options: ["Discretionary Access Control (DAC)", "Mandatory Access Control (MAC)", "Role-Based Access Control (RBAC)", "Lattice-Based Access Control (LBAC)"] },
+                { q: "Which access control assigns users a matrix of authorizations and specifies the level of access each subject has to each object?", a: "Lattice-Based Access Control (LBAC)", options: ["Discretionary Access Control (DAC)", "Lattice-Based Access Control (LBAC)", "Task-Based Access Control", "Nondiscretionary Control"] },
+                { q: "Which access control method allows data users to control and share resources at their own discretion (like peer-to-peer)?", a: "Discretionary Access Control (DAC)", options: ["MAC", "DAC", "LBAC", "RBAC"] },
+                { q: "The mechanism whereby an unverified entity proposes a label by which they are known (e.g., entering a username) is:", a: "Identification", options: ["Authentication", "Identification", "Authorization", "Accountability"] },
+                { q: "The process of validating a supplicant’s purported identity (e.g., verifying a password) is:", a: "Authentication", options: ["Identification", "Authorization", "Authentication", "Accountability"] },
+                { q: "A password or a PIN is an example of which authentication factor?", a: "Something a supplicant knows", options: ["Something a supplicant has", "Something a supplicant is", "Something a supplicant knows", "Something a supplicant does"] },
+                { q: "An ID card, ATM card, or smart token is an example of which authentication factor?", a: "Something a supplicant has", options: ["Something a supplicant knows", "Something a supplicant has", "Something a supplicant is", "Something a supplicant does"] },
+                { q: "Biometrics like fingerprints, retina scans, and voice patterns represent which authentication factor?", a: "Something a supplicant is", options: ["Something a supplicant knows", "Something a supplicant has", "Something a supplicant is", "Something a supplicant creates"] },
+                { q: "The matching of an authenticated entity to a list of information assets and access levels is called:", a: "Authorization", options: ["Identification", "Authentication", "Authorization", "Accountability"] },
+                { q: "Ensuring that all actions on a system can be attributed to an authenticated identity via logs is called:", a: "Accountability", options: ["Authorization", "Accountability", "Identification", "Authentication"] },
+                { q: "Which type of firewall examines only the header information of incoming data packets at the IP level?", a: "Packet-filtering firewall", options: ["Application gateway", "Stateful inspection firewall", "Packet-filtering firewall", "MAC layer firewall"] },
+                { q: "Which type of firewall keeps track of each network connection between internal and external systems using a state table?", a: "Stateful inspection firewall", options: ["Packet-filtering firewall", "Circuit gateway", "Stateful inspection firewall", "MAC layer firewall"] },
+                { q: "An application-level firewall is also known as a:", a: "Proxy server", options: ["Proxy server", "Packet router", "VPN tunnel", "State table"] },
+                { q: "First-generation firewalls consisted of:", a: "Simple packet-filtering routers", options: ["Simple packet-filtering routers", "Application proxy servers", "Stateful inspection tables", "Kernel proxies"] },
+                { q: "What does VPN stand for?", a: "Virtual Private Network", options: ["Visual Packet Node", "Virtual Private Network", "Verified Public Network", "Virtual Protected Node"] },
+                { q: "Which VPN technology relies on leased circuits from a service provider?", a: "Trusted VPN", options: ["Secure VPN", "Hybrid VPN", "Trusted VPN", "Public VPN"] },
+                { q: "In which VPN mode is the data within an IP packet encrypted, but the header information is left unencrypted?", a: "Transport Mode", options: ["Tunnel Mode", "Transport Mode", "Hybrid Mode", "Stealth Mode"] }
+            ]
+        }
+    ];
+
+    let currentModule = 0;
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    function showMenu() {
+        document.getElementById('menu-screen').classList.remove('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.add('hidden');
+    }
+
+    function startQuiz(index) {
+        currentModule = index;
+        currentQuestion = 0;
+        score = 0;
+        
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        answered = false;
+        const module = quizData[currentModule];
+        const qData = module.questions[currentQuestion];
+        const totalQ = module.questions.length;
+        
+        document.getElementById('module-title').innerText = module.title;
+        document.getElementById('q-current').innerText = currentQuestion + 1;
+        document.getElementById('q-total').innerText = totalQ;
+        document.getElementById('current-score').innerText = score;
+        document.getElementById('max-score-display').innerText = `/${totalQ}`;
+        
+        // Update Progress
+        const progress = (currentQuestion / totalQ) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+
+        document.getElementById('question-text').innerText = `${currentQuestion + 1}. ${qData.q}`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        // Shuffle options
+        const shuffled = [...qData.options].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, qData.a);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback').classList.add('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        if (answered) return;
+        answered = true;
+
+        const feedback = document.getElementById('feedback');
+        feedback.classList.remove('hidden');
+
+        // Highlight correct option
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => {
+            b.disabled = true;
+            if (b.innerText === correct) b.classList.add('correct');
+        });
+
+        if (selected === correct) {
+            score++;
+            document.getElementById('current-score').innerText = score;
+            feedback.innerText = "✅ Correct!";
+            feedback.style.backgroundColor = "#dcfce7";
+            feedback.style.color = "#14532d";
+        } else {
+            btn.classList.add('wrong');
+            feedback.innerText = `❌ Incorrect. The correct answer is highlighted above.`;
+            feedback.style.backgroundColor = "#fee2e2";
+            feedback.style.color = "#7f1d1d";
+        }
+
+        // Update Progress to include answered state
+        const totalQ = quizData[currentModule].questions.length;
+        const progress = ((currentQuestion + 1) / totalQ) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.innerText = currentQuestion === (totalQ - 1) ? "Finish Module &rarr;" : "Next Question &rarr;";
+        nextBtn.classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        const totalQ = quizData[currentModule].questions.length;
+        if (currentQuestion < (totalQ - 1)) {
+            currentQuestion++;
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.remove('hidden');
+        
+        const totalQ = quizData[currentModule].questions.length;
+        document.getElementById('final-score').innerText = score;
+        
+        const percentage = (score / totalQ) * 100;
+        const msg = document.getElementById('result-message');
+        
+        if (percentage >= 90) { msg.innerText = "Outstanding! You've mastered these concepts."; msg.style.color = "var(--success)"; }
+        else if (percentage >= 70) { msg.innerText = "Great job! A solid understanding."; msg.style.color = "var(--accent)"; }
+        else if (percentage >= 50) { msg.innerText = "Good effort, but review the material again."; msg.style.color = "#ca8a04"; }
+        else { msg.innerText = "Keep studying! You'll get it next time."; msg.style.color = "var(--error)"; }
+    }
+
+    function retryQuiz() {
+        startQuiz(currentModule);
+    }
+</script>
+
+</body>
+</html>
