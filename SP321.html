@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SP321: 100-Item Comprehensive Reviewer</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --success: #16a34a;
+            --error: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        h1, h2 { text-align: center; color: var(--primary); }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; }
+        
+        .hidden { display: none !important; }
+
+        .menu-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+            background: var(--accent);
+            color: white;
+        }
+
+        button:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn-secondary { background: var(--text-muted); }
+        .btn-secondary:hover { background: #475569; }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: #f1f5f9;
+            color: var(--primary);
+            border: 2px solid transparent;
+            margin-bottom: 12px;
+        }
+
+        .option-btn:hover:not(:disabled) { background: #e2e8f0; }
+        .option-btn:disabled { cursor: default; }
+
+        .option-btn.correct { background: #dcfce7 !important; border-color: var(--success); color: #14532d; }
+        .option-btn.wrong { background: #fee2e2 !important; border-color: var(--error); color: #7f1d1d; }
+
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 15px;
+        }
+
+        /* --- Mobile Responsiveness Adjustments --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px 15px;
+                border-radius: 8px;
+            }
+
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.25rem; }
+            .subtitle { font-size: 0.9rem; margin-bottom: 20px; }
+
+            button {
+                padding: 14px 15px; 
+                font-size: 15px;
+            }
+
+            .stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.95rem;
+                padding-bottom: 10px;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+
+            .nav-controls {
+                flex-direction: column-reverse; /* Puts "Next" button on top for easier tapping */
+            }
+
+            .nav-controls button {
+                width: 100%;
+            }
+
+            .score-display {
+                font-size: 3rem !important; /* Scale down the final score text */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="menu-screen">
+        <h1>SP321: Comprehensive Reviewer</h1>
+        <p class="subtitle">Select a module to begin (25 Questions each)</p>
+        <div class="menu-grid">
+            <button onclick="startQuiz(0)">Module 1: The IT Professional in 2026</button>
+            <button onclick="startQuiz(1)">Module 2: Ethical Frameworks & Codes</button>
+            <button onclick="startQuiz(2)">Module 3: Whistleblowing & Moral Courage</button>
+            <button onclick="startQuiz(3)">Module 4: Algorithmic Bias & Fairness</button>
+        </div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <h2 id="module-title">Module Title</h2>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+        <div class="stats">
+            <span>Question <span id="q-current">1</span> of 25</span>
+            <span>Score: <span id="current-score">0</span></span>
+        </div>
+        
+        <div id="question-text" class="question-text"></div>
+        <div id="options-container"></div>
+        <div id="feedback" class="feedback hidden"></div>
+        
+        <div class="nav-controls">
+            <button class="btn-secondary" onclick="showMenu()">Exit Quiz</button>
+            <button id="next-btn" class="hidden" onclick="nextQuestion()">Next Question &rarr;</button>
+        </div>
+    </div>
+
+    <div id="results-screen" class="hidden">
+        <h2>Module Completed!</h2>
+        <div class="score-display" style="text-align: center; font-size: 4rem; font-weight: bold; color: var(--accent); margin: 20px 0;">
+            <span id="final-score">0</span><span style="font-size: 2rem; color: var(--text-muted)">/25</span>
+        </div>
+        <p id="result-message" style="text-align: center; font-size: 1.2rem; margin-bottom: 30px; font-weight: bold;"></p>
+        <div class="menu-grid">
+            <button onclick="retryQuiz()">Retry Module</button>
+            <button class="btn-secondary" onclick="showMenu()">Main Menu</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            title: "Module 1: Introduction & The IT Professional in 2026",
+            questions: [
+                { q: "What is the key difference between an IT 'Builder' and an IT 'Governor'?", a: "Builders write manual code; Governors supervise AI and ensure compliance.", options: ["Builders manage AI; Governors write code.", "Builders write manual code; Governors supervise AI and ensure compliance.", "Builders deal with hardware; Governors deal with software.", "Builders are managers; Governors are entry-level."] },
+                { q: "What defines 'Agentic AI'?", a: "AI that takes autonomous actions rather than just answering prompts.", options: ["AI used only for generating text.", "AI that takes autonomous actions rather than just answering prompts.", "AI that requires constant human coding.", "AI that operates strictly offline."] },
+                { q: "What is the 'Under-Skilled' Professional Gap?", a: "Having the responsibility but lacking the required skillset.", options: ["Having high skills but no responsibilities.", "Having the responsibility but lacking the required skillset.", "Earning a high salary without managing a team.", "Lacking both skills and responsibilities."] },
+                { q: "Which of these is considered a 'Human Layer' skill in 2026?", a: "Strategic Empathy and Conflict Resolution", options: ["Writing HTML", "Strategic Empathy and Conflict Resolution", "Configuring routers", "Memorizing syntax"] },
+                { q: "What is the 'Over-Skilled' Professional Gap?", a: "Having advanced skills but being assigned low-level responsibilities.", options: ["Having advanced skills but being assigned low-level responsibilities.", "Lacking the skills needed for a promotion.", "Being overly reliant on AI tools.", "Managing too many projects at once."] },
+                { q: "In the 2026 IT landscape, routine boilerplate coding is largely handled by:", a: "Generative AI", options: ["Interns", "Generative AI", "Project Managers", "Offshore teams"] },
+                { q: "The shift from 'Builder' to 'Governor' requires professionals to focus more on:", a: "System architecture, ethics, and security audits.", options: ["Typing speed and memorization.", "System architecture, ethics, and security audits.", "Hardware assembly.", "Basic syntax debugging."] },
+                { q: "Which term describes the external duties expected by an organization from an employee?", a: "Responsibilities", options: ["Skillsets", "Talents", "Responsibilities", "Certifications"] },
+                { q: "Which term describes the internal capabilities, knowledge, and proficiencies a professional possesses?", a: "Skillsets", options: ["Responsibilities", "Mandates", "Skillsets", "Duties"] },
+                { q: "Why is 'Prompt Engineering' becoming a baseline skill rather than a specialized one?", a: "Because interacting with AI effectively is standard practice across all IT roles.", options: ["Because AI is being phased out.", "Because interacting with AI effectively is standard practice across all IT roles.", "Because it requires a PhD.", "Because it replaces all programming languages."] },
+                { q: "In a heavily AI-assisted workflow, what becomes the primary bottleneck for IT professionals?", a: "Ensuring the logical accuracy and ethical compliance of AI outputs.", options: ["Typing code fast enough.", "Ensuring the logical accuracy and ethical compliance of AI outputs.", "Finding a compiler.", "Downloading IDEs."] },
+                { q: "How does the 'Governor' role impact quality assurance (QA)?", a: "QA shifts from finding syntax errors to validating AI logic and edge cases.", options: ["QA is no longer necessary.", "QA shifts from finding syntax errors to validating AI logic and edge cases.", "QA is done purely by the client.", "QA only involves checking hardware."] },
+                { q: "A professional who refuses to learn AI tools and insists on manual coding for every task is at risk of:", a: "Becoming obsolete due to slower productivity.", options: ["Getting a massive promotion.", "Becoming obsolete due to slower productivity.", "Being praised for security.", "Becoming an IT Governor."] },
+                { q: "What does 'Strategic Empathy' involve in IT?", a: "Understanding user pain points and aligning technical solutions to human needs.", options: ["Feeling sorry for broken code.", "Understanding user pain points and aligning technical solutions to human needs.", "Ignoring client requests.", "Automating human resources."] },
+                { q: "As AI handles more technical execution, human value in IT shifts toward:", a: "Problem definition and strategic decision-making.", options: ["Faster keyboard typing.", "Problem definition and strategic decision-making.", "Memorizing documentation.", "Manual server maintenance."] },
+                { q: "If an AI generates a script that contains a security vulnerability, who is ultimately responsible?", a: "The IT Governor who reviewed and deployed it.", options: ["The AI tool.", "The AI development company.", "The IT Governor who reviewed and deployed it.", "The end-user."] },
+                { q: "Which scenario best illustrates the 'Under-Skilled' gap?", a: "A junior developer tasked with architecting a cloud infrastructure without prior experience.", options: ["A senior engineer fixing a typo.", "A junior developer tasked with architecting a cloud infrastructure without prior experience.", "An AI generating a logo.", "A manager delegating tasks."] },
+                { q: "Which scenario best illustrates the 'Over-Skilled' gap?", a: "A senior cloud architect whose daily job is resetting user passwords.", options: ["A junior developer learning React.", "An intern managing the database.", "A senior cloud architect whose daily job is resetting user passwords.", "An AI writing Python code."] },
+                { q: "What is a major risk of blindly trusting Agentic AI in a production environment?", a: "It may execute actions that compromise security or data integrity without human oversight.", options: ["It will run too slowly.", "It may execute actions that compromise security or data integrity without human oversight.", "It will ask too many questions.", "It will consume too much electricity."] },
+                { q: "How should an IT professional view Generative AI tools?", a: "As force multipliers that enhance productivity and require careful steering.", options: ["As complete replacements for human workers.", "As force multipliers that enhance productivity and require careful steering.", "As dangerous tools to be avoided.", "As infallible sources of truth."] },
+                { q: "The ability to mediate disagreements between a technical team and business stakeholders is an example of:", a: "Conflict Resolution (Human Layer Skill)", options: ["Technical Debt", "Conflict Resolution (Human Layer Skill)", "Agentic AI", "Prompt Engineering"] },
+                { q: "An IT Governor must possess a strong understanding of 'Compliance'. What does this mean?", a: "Ensuring systems adhere to legal, regulatory, and ethical standards.", options: ["Making sure code compiles without warnings.", "Ensuring systems adhere to legal, regulatory, and ethical standards.", "Forcing users to comply with IT demands.", "Following the project manager blindly."] },
+                { q: "What is the ultimate goal of bridging the Professional Gap?", a: "Aligning an individual's capabilities perfectly with their organizational responsibilities.", options: ["Paying everyone the exact same salary.", "Aligning an individual's capabilities perfectly with their organizational responsibilities.", "Replacing all junior staff with AI.", "Removing all management layers."] },
+                { q: "In the context of 2026, 'Adaptability' for an IT professional means:", a: "Continuously learning to govern new AI tools and evolving methodologies.", options: ["Sticking to one programming language forever.", "Continuously learning to govern new AI tools and evolving methodologies.", "Changing jobs every three months.", "Refusing to use cloud services."] },
+                { q: "Why is human oversight irreplaceable even with advanced Agentic AI?", a: "AI lacks true moral judgment and context awareness for high-stakes decisions.", options: ["AI cannot connect to the internet.", "AI is too expensive to run 24/7.", "AI lacks true moral judgment and context awareness for high-stakes decisions.", "AI cannot write code."] }
+            ]
+        },
+        {
+            title: "Module 2: Ethical Frameworks & Codes of Conduct",
+            questions: [
+                { q: "Which framework determines morality based solely on the consequences (the outcome)?", a: "Utilitarianism", options: ["Deontology", "Virtue Ethics", "Utilitarianism", "Relativism"] },
+                { q: "Which ethical framework asserts that some actions are universally right or wrong, regardless of the outcome?", a: "Deontology", options: ["Utilitarianism", "Virtue Ethics", "Deontology", "Subjectivism"] },
+                { q: "Virtue Ethics focuses primarily on:", a: "The character and moral habits of the person acting.", options: ["The rules broken during an action.", "The mathematical outcome of happiness.", "The character and moral habits of the person acting.", "The cultural norms of the society."] },
+                { q: "Who is the philosopher most closely associated with Deontology?", a: "Immanuel Kant", options: ["John Stuart Mill", "Aristotle", "Immanuel Kant", "Socrates"] },
+                { q: "Who are the philosophers most closely associated with Utilitarianism?", a: "Jeremy Bentham and John Stuart Mill", options: ["Aristotle and Plato", "Jeremy Bentham and John Stuart Mill", "Immanuel Kant and Locke", "Rousseau and Hobbes"] },
+                { q: "If a developer writes a script that illegally steals data but uses it to donate money to millions of poor people, a strict Utilitarian would likely argue:", a: "The action is good because it maximized overall happiness.", options: ["The action is inherently wrong because stealing is a violation of duty.", "The action is good because it maximized overall happiness.", "The developer lacks the virtue of honesty.", "The action is neutral."] },
+                { q: "In the same scenario (stealing to give to the poor), a strict Deontologist would argue:", a: "The action is wrong because stealing violates a universal moral rule.", options: ["The action is wrong because stealing violates a universal moral rule.", "The action is good because of the positive outcome.", "The action demonstrates the virtue of charity.", "It depends on the culture."] },
+                { q: "A 'Code of Ethics' in IT primarily serves to:", a: "Provide a standard of professional conduct and protect the public trust.", options: ["Guarantee higher salaries for developers.", "Provide a standard of professional conduct and protect the public trust.", "Prevent employees from quitting.", "Replace national laws."] },
+                { q: "The ACM Code of Ethics emphasizes that computing professionals must prioritize:", a: "The public good and human well-being.", options: ["Corporate profit above all.", "The public good and human well-being.", "The fastest execution time of code.", "Protecting the reputation of their employer."] },
+                { q: "What does 'Relativism' suggest about ethics?", a: "Morals are subjective and depend on cultural or individual perspectives.", options: ["There is one universal moral law.", "Morals are subjective and depend on cultural or individual perspectives.", "Only outcomes matter.", "Ethics only apply to humans, not machines."] },
+                { q: "Which framework is often described as 'the math of happiness vs. suffering'?", a: "Utilitarianism", options: ["Virtue Ethics", "Deontology", "Utilitarianism", "Divine Command"] },
+                { q: "A professional who refuses to deploy a biased AI because 'it violates the duty to treat all users fairly' is using:", a: "Deontological reasoning.", options: ["Utilitarian reasoning.", "Deontological reasoning.", "Relativist reasoning.", "Egoist reasoning."] },
+                { q: "Which of the following is a core characteristic of a 'Profession'?", a: "A specialized body of knowledge and a commitment to public service.", options: ["Hourly wages.", "A specialized body of knowledge and a commitment to public service.", "Working remotely.", "Using computers."] },
+                { q: "Under Virtue Ethics, how does one become a moral IT professional?", a: "By consistently practicing good habits (virtues) like honesty and courage over time.", options: ["By memorizing the rulebook.", "By calculating the outcomes of every action.", "By consistently practicing good habits (virtues) like honesty and courage over time.", "By never making a mistake."] },
+                { q: "What is a major criticism of Utilitarianism?", a: "It can justify harming a minority if it benefits the majority.", options: ["It is too strict about rules.", "It can justify harming a minority if it benefits the majority.", "It focuses too much on character.", "It ignores the consequences of actions."] },
+                { q: "What is a major criticism of Deontology?", a: "It can be too rigid, ignoring disastrous consequences of following a rule.", options: ["It relies too heavily on predicting the future.", "It can be too rigid, ignoring disastrous consequences of following a rule.", "It is mathematically impossible to calculate.", "It depends entirely on cultural feelings."] },
+                { q: "If an IT worker discovers a security flaw and reports it because 'being honest is the kind of person I want to be', this reflects:", a: "Virtue Ethics", options: ["Deontology", "Utilitarianism", "Virtue Ethics", "Cultural Relativism"] },
+                { q: "The IEEE Code of Ethics strongly emphasizes:", a: "Accepting responsibility in making decisions consistent with the safety, health, and welfare of the public.", options: ["Maximizing shareholder value.", "Accepting responsibility in making decisions consistent with the safety, health, and welfare of the public.", "Keeping all source code proprietary.", "Avoiding all political discussions."] },
+                { q: "In professional ethics, what does 'Integrity' mean?", a: "Being honest, transparent, and adhering to moral principles consistently.", options: ["Writing code without bugs.", "Being honest, transparent, and adhering to moral principles consistently.", "Working long hours without overtime pay.", "Agreeing with the manager at all times."] },
+                { q: "A company knowingly sells software with a critical bug to meet a financial deadline. This violates the ethical principle of:", a: "Honesty and minimizing harm.", options: ["Free market economics.", "Honesty and minimizing harm.", "Agile development.", "Cultural relativism."] },
+                { q: "Which principle dictates that IT professionals should respect intellectual property rights (e.g., not pirating software)?", a: "Honoring confidentiality and property rights.", options: ["Maximizing utility.", "Honoring confidentiality and property rights.", "Freedom of information.", "Open-source mandate."] },
+                { q: "How do professional codes of ethics handle 'Confidentiality'?", a: "It must be maintained unless legally or ethically required to prevent severe harm.", options: ["It must never be broken under any circumstances.", "It must be maintained unless legally or ethically required to prevent severe harm.", "It is optional depending on the client.", "It only applies to financial data."] },
+                { q: "Which ethical framework asks the question: 'What kind of person am I becoming by doing this?'", a: "Virtue Ethics", options: ["Deontology", "Utilitarianism", "Relativism", "Virtue Ethics"] },
+                { q: "Which ethical framework asks the question: 'What is my duty in this situation?'", a: "Deontology", options: ["Deontology", "Utilitarianism", "Relativism", "Virtue Ethics"] },
+                { q: "Which ethical framework asks the question: 'Which action produces the greatest good for the greatest number?'", a: "Utilitarianism", options: ["Deontology", "Utilitarianism", "Relativism", "Virtue Ethics"] }
+            ]
+        },
+        {
+            title: "Module 3: Whistleblowing & Moral Courage",
+            questions: [
+                { q: "What does Philippine Law RA 6981 provide?", a: "Witness Protection, Security, and Benefit Act.", options: ["Data Privacy regulations.", "Anti-Graft provisions.", "Witness Protection, Security, and Benefit Act.", "Cybercrime penalties."] },
+                { q: "RA 3019 is heavily used in public sector whistleblowing. What is its name?", a: "Anti-Graft and Corrupt Practices Act.", options: ["Anti-Graft and Corrupt Practices Act.", "E-Commerce Law.", "Data Privacy Act.", "Labor Code."] },
+                { q: "How does the Data Privacy Act (RA 10173) relate to whistleblowing?", a: "It protects the reporting of data breaches and penalizes companies that hide them.", options: ["It makes whistleblowing illegal.", "It protects the reporting of data breaches and penalizes companies that hide them.", "It forces whistleblowers to reveal their identities.", "It only applies to social media companies."] },
+                { q: "What is 'Internal Whistleblowing'?", a: "Reporting misconduct to authorities within the organization (e.g., HR or Compliance).", options: ["Reporting misconduct to the media.", "Reporting misconduct to authorities within the organization (e.g., HR or Compliance).", "Posting anonymously on Twitter.", "Telling a competitor about a flaw."] },
+                { q: "What is 'External Whistleblowing'?", a: "Reporting misconduct to outside entities like government regulators or the press.", options: ["Reporting to your direct supervisor.", "Reporting to the company CEO.", "Reporting misconduct to outside entities like government regulators or the press.", "Filing a bug report in Jira."] },
+                { q: "In the 'Load Balance' Dilemma, what does 'Technical Debt' refer to?", a: "A 'quick and dirty' fix implemented now that causes severe systemic risks later.", options: ["Money the IT department owes to the finance department.", "A 'quick and dirty' fix implemented now that causes severe systemic risks later.", "The cost of cloud servers.", "A loan taken out to buy computers."] },
+                { q: "Why is whistleblowing often considered an action of 'Last Resort'?", a: "Because it carries heavy personal and professional risks and should follow internal channels first.", options: ["Because it is usually illegal.", "Because it carries heavy personal and professional risks and should follow internal channels first.", "Because the media pays well for stories.", "Because it guarantees a promotion."] },
+                { q: "What defines 'Moral Courage' in the IT profession?", a: "The willingness to stand up for ethical principles despite the risk of retaliation.", options: ["The ability to delete the production database.", "The willingness to stand up for ethical principles despite the risk of retaliation.", "Working 80-hour weeks without complaining.", "Ignoring bugs to meet a deadline."] },
+                { q: "Which of the following is a common form of retaliation against a whistleblower?", a: "Demotion, isolation, or wrongful termination.", options: ["A salary bonus.", "Demotion, isolation, or wrongful termination.", "A public award.", "A promotion to management."] },
+                { q: "Before blowing the whistle externally, an IT professional should generally ensure:", a: "They have documented evidence and have exhausted internal reporting channels.", options: ["They have an offer from a rival company.", "They have documented evidence and have exhausted internal reporting channels.", "They have deleted all their code.", "They have posted about it on Facebook."] },
+                { q: "What is a 'Non-Disclosure Agreement' (NDA)?", a: "A legal contract preventing the sharing of confidential company information.", options: ["A law protecting whistleblowers.", "A legal contract preventing the sharing of confidential company information.", "An open-source software license.", "A union contract."] },
+                { q: "Can an NDA legally prevent an employee from reporting a crime to the government?", a: "No, NDAs cannot legally conceal criminal activity or severe public harm.", options: ["Yes, an NDA is absolute.", "No, NDAs cannot legally conceal criminal activity or severe public harm.", "Yes, but only in the tech industry.", "No, NDAs are never legally binding anyway."] },
+                { q: "What makes the 'Load Balance' Dilemma difficult?", a: "The pressure from management to keep the system running versus the ethical need to fix a critical flaw.", options: ["The server is too heavy to lift.", "The pressure from management to keep the system running versus the ethical need to fix a critical flaw.", "The programming language is outdated.", "The internet connection is too slow."] },
+                { q: "If a developer discovers their company's app is secretly tracking users' locations without consent, reporting this is an act of protecting:", a: "Data Privacy", options: ["Copyright", "Data Privacy", "Trade Secrets", "Hardware Integrity"] },
+                { q: "Which ethical framework strongly supports whistleblowing as a 'duty' to protect the public?", a: "Deontology", options: ["Relativism", "Deontology", "Egoism", "Nihilism"] },
+                { q: "Which ethical framework supports whistleblowing if it prevents a disaster that would harm thousands of people?", a: "Utilitarianism", options: ["Virtue Ethics", "Relativism", "Utilitarianism", "Subjectivism"] },
+                { q: "What role does 'Anonymity' play in whistleblowing?", a: "It protects the whistleblower from immediate retaliation, though it can make investigation harder.", options: ["It is illegal in all cases.", "It protects the whistleblower from immediate retaliation, though it can make investigation harder.", "It means the report will be ignored.", "It guarantees a financial reward."] },
+                { q: "What is the 'Bystander Effect' in corporate ethics?", a: "When employees assume someone else will report the problem, so no one does.", options: ["When people actively help solve a crisis.", "When employees assume someone else will report the problem, so no one does.", "When managers watch developers code.", "When a bug only happens occasionally."] },
+                { q: "A whistleblower leaks confidential client medical data to prove the system is insecure. Is this ethical?", a: "No, they should prove the flaw without exposing sensitive user data.", options: ["Yes, the ends justify the means.", "No, they should prove the flaw without exposing sensitive user data.", "Yes, because it gets the media's attention.", "No, because the media doesn't care about medical data."] },
+                { q: "Under RA 6981, a whistleblower may be granted immunity from criminal prosecution if:", a: "Their testimony is absolutely necessary to convict the most guilty party.", options: ["They pay a fine.", "Their testimony is absolutely necessary to convict the most guilty party.", "They post a public apology.", "They resign from their job."] },
+                { q: "What is 'Complicity' in an ethical context?", a: "Being involved in or silently allowing an unethical act to occur.", options: ["Writing complex code.", "Being involved in or silently allowing an unethical act to occur.", "Fixing a bug efficiently.", "Reporting a crime."] },
+                { q: "A manager tells you: 'Just patch it so it works for the demo, we'll fix the security hole later.' This is an example of creating:", a: "Technical Debt", options: ["Financial Debt", "Technical Debt", "Agentic AI", "Proxy Bias"] },
+                { q: "To exhibit Moral Courage, an IT professional must overcome:", a: "Fear of retaliation, job loss, or peer rejection.", options: ["Lack of coding skills.", "Fear of retaliation, job loss, or peer rejection.", "Boredom.", "Hardware limitations."] },
+                { q: "Who is the primary beneficiary of a justifiable act of whistleblowing?", a: "The public or the affected stakeholders.", options: ["The whistleblower's bank account.", "The company's CEO.", "The public or the affected stakeholders.", "The competitor company."] },
+                { q: "The National Privacy Commission (NPC) is the primary government body enforcing which law?", a: "RA 10173 (Data Privacy Act)", options: ["RA 3019 (Anti-Graft)", "RA 6981 (Witness Protection)", "RA 10173 (Data Privacy Act)", "RA 10844 (DICT Act)"] }
+            ]
+        },
+        {
+            title: "Module 4: Algorithmic Bias & Fairness",
+            questions: [
+                { q: "What is Algorithmic Bias?", a: "Systematic and repeatable errors in a computer system that create unfair outcomes.", options: ["A syntax error in Python.", "Systematic and repeatable errors in a computer system that create unfair outcomes.", "When an AI operates too slowly.", "When an algorithm uses too much memory."] },
+                { q: "What is 'Proxy Variable Bias'?", a: "When an AI uses a seemingly neutral variable (like zip code) that correlates strongly with a protected trait (like race).", options: ["When an AI uses a VPN.", "When an AI uses a seemingly neutral variable (like zip code) that correlates strongly with a protected trait (like race).", "When developers use substitute hardware.", "When data is completely randomized."] },
+                { q: "Why is 'Historical Bias' dangerous in machine learning?", a: "Because training AI on past data will cause it to learn and replicate past societal inequalities.", options: ["Because historical data is usually deleted.", "Because training AI on past data will cause it to learn and replicate past societal inequalities.", "Because historical data is too small.", "Because AI cannot understand dates."] },
+                { q: "What describes a 'Representation Gap'?", a: "When the training dataset severely underrepresents certain minority groups.", options: ["When the UI is not responsive on mobile.", "When the training dataset severely underrepresents certain minority groups.", "When the code is not commented.", "When the algorithm runs too fast."] },
+                { q: "How does a 'Feedback Loop' worsen algorithmic bias?", a: "Biased predictions lead to biased actions, which generate more biased data to feed the AI.", options: ["It deletes the database automatically.", "Biased predictions lead to biased actions, which generate more biased data to feed the AI.", "It causes the CPU to overheat.", "It makes the AI self-aware."] },
+                { q: "Which of the following is an 'Inclusion Strategy' during Data Preprocessing?", a: "Data Augmentation or Resampling to balance demographic representation.", options: ["Deleting data from minority groups.", "Data Augmentation or Resampling to balance demographic representation.", "Using only historical data.", "Ignoring data anomalies."] },
+                { q: "If a facial recognition software only accurately identifies lighter-skinned individuals, it likely suffered from:", a: "A Representation Gap in its training data.", options: ["A Representation Gap in its training data.", "Too much processing power.", "A lack of proxy variables.", "Perfect algorithmic fairness."] },
+                { q: "What is 'Algorithmic Transparency' or Explainable AI (XAI)?", a: "Designing AI so humans can understand exactly how and why it made a specific decision.", options: ["Making the code open-source.", "Designing AI so humans can understand exactly how and why it made a specific decision.", "Using clear variable names.", "Selling the algorithm to the public."] },
+                { q: "What is the danger of a 'Black Box' algorithm in criminal justice or hiring?", a: "No one can verify if its decisions are based on illegal biases because the logic is hidden.", options: ["It costs too much money.", "It uses too much electricity.", "No one can verify if its decisions are based on illegal biases because the logic is hidden.", "It is too easy to hack."] },
+                { q: "If an AI resume screener downgrades applicants who attended all-women's colleges, it is demonstrating:", a: "Gender Bias", options: ["Age Bias", "Gender Bias", "Confirmation Bias", "Technical Debt"] },
+                { q: "What does it mean to 'Audit' an algorithm?", a: "Testing the system specifically to uncover hidden biases or unfair outcomes before and after deployment.", options: ["Checking the code for syntax errors.", "Testing the system specifically to uncover hidden biases or unfair outcomes before and after deployment.", "Calculating how much the software cost to build.", "Deleting old data."] },
+                { q: "Confirmation Bias in AI design occurs when:", a: "Developers build systems that reflect and confirm their own subconscious beliefs and prejudices.", options: ["The AI confirms a user's password.", "Developers build systems that reflect and confirm their own subconscious beliefs and prejudices.", "The compiler confirms the code is clean.", "The system asks 'Are you sure?' before deleting a file."] },
+                { q: "What is 'Demographic Parity' as a fairness metric?", a: "Ensuring the algorithm's positive outcome rate is equal across all demographic groups.", options: ["Ensuring the algorithm runs equally fast on all computers.", "Ensuring the algorithm's positive outcome rate is equal across all demographic groups.", "Ensuring the dataset has exactly 1 million rows.", "Ensuring the AI has a human name."] },
+                { q: "Why might removing a column for 'Race' from a dataset NOT prevent racial bias?", a: "Because proxy variables (like neighborhood or income) can still lead the AI to deduce race.", options: ["Because AI can see through the screen.", "Because proxy variables (like neighborhood or income) can still lead the AI to deduce race.", "Because race isn't a real data point.", "Because removing columns corrupts the database."] },
+                { q: "In predictive policing, why do minority neighborhoods often get over-policed by AI?", a: "Historical bias in arrest records creates a feedback loop directing more police to those areas.", options: ["The AI physically forces police to go there.", "Historical bias in arrest records creates a feedback loop directing more police to those areas.", "The AI is programmed to hate specific streets.", "The AI uses GPS to find traffic jams."] },
+                { q: "Which group is most responsible for preventing Algorithmic Bias?", a: "The data scientists and developers designing the system.", options: ["The end-users.", "The data scientists and developers designing the system.", "The marketing department.", "The hardware manufacturers."] },
+                { q: "What is 'Data Sanitization' in the context of fairness?", a: "Removing or adjusting biased data points before the AI trains on them.", options: ["Wiping a hard drive completely.", "Removing or adjusting biased data points before the AI trains on them.", "Cleaning the physical servers.", "Encrypting passwords."] },
+                { q: "What is a 'False Positive' in the context of an AI fraud detection system?", a: "A legitimate transaction incorrectly flagged as fraudulent.", options: ["A legitimate transaction incorrectly flagged as fraudulent.", "A fraudulent transaction that goes undetected.", "A successful login.", "A system crash."] },
+                { q: "If a loan approval AI has a much higher 'False Positive' rejection rate for minorities, the system is:", a: "Unfair and disproportionately harming a protected class.", options: ["Working perfectly as designed.", "Unfair and disproportionately harming a protected class.", "Lacking a user interface.", "Only doing what the government wants."] },
+                { q: "What does 'Human-in-the-Loop' (HITL) mean in AI deployment?", a: "Requiring a human to review and approve the AI's high-stakes decisions.", options: ["The AI controls the human.", "Requiring a human to review and approve the AI's high-stakes decisions.", "The AI is placed inside a robot.", "A human manually types all the data."] },
+                { q: "What is 'Selection Bias'?", a: "When the data collected is not fully randomized and doesn't represent the true population.", options: ["When the user selects the wrong button.", "When the data collected is not fully randomized and doesn't represent the true population.", "When the AI selects the fastest processing route.", "When an employer selects the best candidate."] },
+                { q: "Why are healthcare algorithms susceptible to bias?", a: "They may use healthcare cost as a proxy for health needs, disadvantaging poorer patients.", options: ["Doctors don't know how to use computers.", "They may use healthcare cost as a proxy for health needs, disadvantaging poorer patients.", "Hospitals don't have enough data.", "Medical data cannot be digitized."] },
+                { q: "To ensure an AI is fair, development teams should be:", a: "Diverse and multidisciplinary.", options: ["Made entirely of programmers.", "Diverse and multidisciplinary.", "Composed of only managers.", "Outsourced to the cheapest bidder."] },
+                { q: "If an AI model works fairly in testing but exhibits bias after a year in production, what is required?", a: "Continuous monitoring and retraining (Model Maintenance).", options: ["Nothing, the test phase was enough.", "Continuous monitoring and retraining (Model Maintenance).", "Firing the original developers.", "Shutting down the company."] },
+                { q: "Which ethical framework would argue that algorithmic bias is wrong because it systematically violates the duty of equal respect for all persons?", a: "Deontology", options: ["Utilitarianism", "Virtue Ethics", "Deontology", "Egoism"] }
+            ]
+        }
+    ];
+
+    let currentModule = 0;
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    function showMenu() {
+        document.getElementById('menu-screen').classList.remove('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.add('hidden');
+    }
+
+    function startQuiz(index) {
+        currentModule = index;
+        currentQuestion = 0;
+        score = 0;
+        
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        answered = false;
+        const module = quizData[currentModule];
+        const qData = module.questions[currentQuestion];
+        
+        document.getElementById('module-title').innerText = module.title;
+        document.getElementById('q-current').innerText = currentQuestion + 1;
+        document.getElementById('current-score').innerText = score;
+        
+        const progress = (currentQuestion / 25) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+
+        document.getElementById('question-text').innerText = `${currentQuestion + 1}. ${qData.q}`;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        const shuffled = [...qData.options].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, qData.a);
+            container.appendChild(btn);
+        });
+
+        document.getElementById('feedback').classList.add('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        if (answered) return;
+        answered = true;
+
+        const feedback = document.getElementById('feedback');
+        feedback.classList.remove('hidden');
+
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => {
+            b.disabled = true;
+            if (b.innerText === correct) b.classList.add('correct');
+        });
+
+        if (selected === correct) {
+            score++;
+            document.getElementById('current-score').innerText = score;
+            feedback.innerText = "✅ Correct!";
+            feedback.style.backgroundColor = "#dcfce7";
+            feedback.style.color = "#14532d";
+        } else {
+            btn.classList.add('wrong');
+            feedback.innerText = `❌ Incorrect. The answer is highlighted above.`;
+            feedback.style.backgroundColor = "#fee2e2";
+            feedback.style.color = "#7f1d1d";
+        }
+
+        const progress = ((currentQuestion + 1) / 25) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.innerText = currentQuestion === 24 ? "Finish Module &rarr;" : "Next Question &rarr;";
+        nextBtn.classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        if (currentQuestion < 24) {
+            currentQuestion++;
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.remove('hidden');
+        
+        document.getElementById('final-score').innerText = score;
+        
+        const msg = document.getElementById('result-message');
+        if (score >= 22) { msg.innerText = "Outstanding! You've mastered these concepts."; msg.style.color = "var(--success)"; }
+        else if (score >= 17) { msg.innerText = "Great job! A solid understanding."; msg.style.color = "var(--accent)"; }
+        else if (score >= 12) { msg.innerText = "Good effort, but review the material again."; msg.style.color = "#ca8a04"; }
+        else { msg.innerText = "Keep studying! You'll get it next time."; msg.style.color = "var(--error)"; }
+    }
+
+    function retryQuiz() {
+        startQuiz(currentModule);
+    }
+</script>
+
+</body>
+</html>
