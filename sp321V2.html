@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT PROF EL 3 Ultimate Quiz (60 Items)</title>
+    <title>SP321 Reviewer - Version 2</title>
     <style>
-        :root { --primary: #10b981; --primary-dark: #059669; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --text-muted: #94a3b8; --danger: #ef4444; }
+        :root { --primary: #f59e0b; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --success: #10b981; --danger: #ef4444; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; margin: 0; min-height: 100vh; align-items: center; }
-        .card { background: var(--card-bg); width: 100%; max-width: 750px; padding: 2.5rem; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid #334155; }
+        .card { background: var(--card); width: 100%; max-width: 750px; padding: 2.5rem; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid #334155; }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
         .header h2 { margin: 0; color: var(--primary); font-size: 1.6rem; }
         .progress-bar { height: 8px; background: #334155; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
-        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
         .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 25px; line-height: 1.5; color: #f1f5f9; }
         .options { display: grid; gap: 12px; }
         .option-btn { padding: 16px; border: 2px solid #334155; border-radius: 10px; background: #0f172a; font-size: 1.05rem; text-align: left; cursor: pointer; transition: 0.2s; color: var(--text); font-weight: 500; }
         .option-btn:hover:not(:disabled) { border-color: var(--primary); background: #1e293b; transform: translateX(5px); }
-        .option-btn.correct { background: var(--primary-dark); color: white; border-color: var(--primary); }
-        .option-btn.wrong { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger); }
+        .option-btn.correct { background: var(--success); border-color: var(--success); color: white; }
+        .option-btn.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); color: #fca5a5; }
         .nav-controls { display: flex; gap: 15px; margin-top: 30px; }
         .btn { flex: 1; padding: 16px; border: none; border-radius: 10px; font-size: 1.15rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .next-btn { background: var(--text); color: var(--bg); }
@@ -28,7 +28,7 @@
 <body>
 <div class="card" id="quiz-card">
     <div class="header">
-        <h2>IT PROF EL 3 Master Quiz</h2>
+        <h2>SP321 Master Quiz V2</h2>
         <div id="q-counter" style="color: var(--primary); font-weight: bold;">1 / 60</div>
     </div>
     <div class="progress-bar"><div id="progress-fill"></div></div>
@@ -41,69 +41,68 @@
 </div>
 
 <script>
+    // These are the exact 60 questions provided for SP321
     const questions = [
-        // RETAINED ORIGINAL QUESTIONS [cite: 144-203]
-        { q: "Which protocol is faster but less reliable?", options: ["TCP", "HTTP", "FTP"], answer: "UDP" },
-        { q: "Which protocol ensures reliable data delivery?", options: ["UDP", "IP", "SMTP"], answer: "TCP" },
-        { q: "What is a foreign key used for?", options: ["Sort data faster", "Encrypt user passwords", "Delete duplicate records"], answer: "Connect tables together" },
-        { q: "What does CRUD stand for?", options: ["Copy, Run, Undo, Deploy", "Compile, Run, Upload, Download", "Catch, Route, Update, Drop"], answer: "Create, Read, Update, Delete" },
-        { q: "Which HTTP method is used to retrieve data?", options: ["POST", "PUT", "DELETE"], answer: "GET" },
-        { q: "What does REST stand for?", options: ["Real-time System Transfer", "Relational Storage Technology", "Remote Execution State Tool"], answer: "Representational State Transfer" },
-        { q: "What does DOM stand for?", options: ["Data Output Module", "Digital Origin Method", "Dynamic Object Manipulation"], answer: "Document Object Model" },
-        { q: "Which language adds interactivity to web pages?", options: ["HTML", "CSS", "SQL"], answer: "JavaScript" },
-        { q: "Which is a common example of a client?", options: ["Web Server", "Database", "Router"], answer: "Web Browser" },
-        { q: "What are the layers of a 3-tier architecture?", options: ["Client, Server, Network", "Physical, Data Link, Network", "Frontend, Backend, Middleware"], answer: "Presentation, Application, Data layer" },
-        { q: "What best describes a client in a network?", options: ["A machine that stores large databases", "A protocol for routing packets", "A firewall that protects the system"], answer: "A program/device that requests services" },
-        { q: "What does scalability mean?", options: ["Ability to encrypt network traffic", "Ability to compress file sizes", "Ability to render 3D graphics"], answer: "Ability to handle increased workload" },
-        { q: "Which is commonly used as a code editor/IDE?", options: ["Apache", "MySQL", "Nginx"], answer: "Visual Studio Code" },
-        { q: "What is the role of a local server?", options: ["Connect to satellite networks", "Store global DNS records", "Block malicious internet traffic"], answer: "Simulate a production server for testing" },
-        { q: "What is a server-side program?", options: ["Code that runs in the browser", "A mobile application UI", "A styling stylesheet"], answer: "Code that runs on the server" },
-        { q: "Which API is used for AJAX in modern JS?", options: ["DOM API", "Canvas API", "WebGL API"], answer: "Fetch API" },
-        { q: "What is the purpose of multithreading in a server?", options: ["Improve database indexing", "Compress images on the fly", "Generate SSL certificates"], answer: "Handle multiple clients simultaneously" },
-        { q: "Which connects application to database?", options: ["HTML tags", "CSS stylesheets", "Network router"], answer: "Server-side script" },
-        { q: "What is the purpose of a development environment?", options: ["Host applications for the public", "Store permanent user backups", "Route traffic between servers"], answer: "Create and test applications" },
-        { q: "Which data format is commonly used in REST APIs?", options: ["XML", "CSV", "YAML"], answer: "JSON" },
-        { q: "Which operation retrieves data from a database?", options: ["INSERT", "UPDATE", "DELETE"], answer: "SELECT" },
-        { q: "Which task is handled by server-side programs?", options: ["Browser rendering", "CSS animations", "DOM manipulation"], answer: "Database interaction" },
-        { q: "What advantage does server-side programming provide?", options: ["Faster UI rendering", "Offline browser support", "Less bandwidth usage"], answer: "Better data security and processing" },
-        { q: "Which is a client-server application example?", options: ["A standalone calculator app", "A text document on a USB", "A single-player offline game"], answer: "Online banking system" },
-        { q: "Which component initiates communication?", options: ["Server", "Database", "Switch"], answer: "Client" },
-        { q: "Which stores structured data?", options: ["Web Server", "Load Balancer", "DNS Server"], answer: "Database server" },
-        { q: "Which layer handles user interaction?", options: ["Data layer", "Application layer", "Network layer"], answer: "Presentation layer" },
-        { q: "Which tool helps developers track changes in code?", options: ["Node.js", "Docker", "Jenkins"], answer: "Git" },
-        { q: "Which software stack is used for web development?", options: ["OSI Model", "TCP/IP Stack", "ELK Stack"], answer: "LAMP Stack" },
-        { q: "Which is a server-side language?", options: ["HTML", "CSS", "React"], answer: "PHP" },
-        // --- 30 NEW QUESTIONS FROM MODULES --- [cite: 1-11]
-        { q: "In a 2-tier architecture, what type of client handles both the UI and the bulk of the business logic?", options: ["Thin Client", "Zero Client", "Dumb Terminal"], answer: "Fat Client" },
-        { q: "What is the definition of a 'Thin Client'?", options: ["A client that stores a large local database", "A server that has minimal RAM", "A network router with low bandwidth"], answer: "A client that relies heavily on the server for processing" },
-        { q: "What characteristic ensures a server is always available to handle client requests?", options: ["Load Balancing", "Network Latency", "Data Encryption"], answer: "High Availability" },
-        { q: "What does the 'A' in the LAMP stack stand for?", options: ["Angular", "Application", "AJAX"], answer: "Apache" },
-        { q: "Which software bundle provides a local server environment (Apache, MySQL, PHP)?", options: ["Node.js", "Docker", "Visual Studio Code"], answer: "XAMPP" },
-        { q: "Which server-side language is known for frameworks like Django and Flask?", options: ["Ruby", "PHP", "Java"], answer: "Python" },
-        { q: "What handles concurrent client requests by assigning a separate process to each?", options: ["Single-threading", "Event Loop", "Asynchronous polling"], answer: "Multiprocessing / Multithreading" },
-        { q: "What standard language is used for managing and querying relational databases?", options: ["HTML", "JavaScript", "Python"], answer: "SQL" },
-        { q: "What does the 'R' in RDBMS stand for?", options: ["Redundant", "Remote", "Real-time"], answer: "Relational" },
-        { q: "In a database, what uniquely identifies each record in a table?", options: ["Foreign Key", "Index", "Column Name"], answer: "Primary Key" },
-        { q: "Which SQL statement is used to add a new record to a table?", options: ["UPDATE", "ADD", "CREATE"], answer: "INSERT" },
-        { q: "What is the process of organizing database tables to minimize data redundancy?", options: ["Indexing", "Encryption", "Hashing"], answer: "Normalization" },
-        { q: "Which technology is responsible for the basic structure of a webpage?", options: ["CSS", "JavaScript", "PHP"], answer: "HTML" },
-        { q: "Which technology handles the visual styling of a webpage?", options: ["HTML", "JavaScript", "Python"], answer: "CSS" },
-        { q: "Which framework acts as a CSS library for responsive, mobile-first websites?", options: ["React", "Express", "Django"], answer: "Bootstrap" },
-        { q: "Which HTTP method is typically used to submit new data?", options: ["GET", "PUT", "DELETE"], answer: "POST" },
-        { q: "Which HTTP status code typically indicates a successful request?", options: ["404 Not Found", "500 Internal Error", "301 Moved"], answer: "200 OK" },
-        { q: "What does the HTTP status code 404 indicate?", options: ["Server Error", "Unauthorized", "Forbidden"], answer: "Not Found" },
-        { q: "In RESTful APIs, what does a URL/URI fundamentally represent?", options: ["An action", "A server configuration", "A database query"], answer: "A resource" },
-        { q: "Which characteristic of REST implies that the server does not store client context?", options: ["Cacheability", "Layered System", "Uniform Interface"], answer: "Statelessness" },
-        { q: "What does AJAX stand for?", options: ["Advanced Java and XML", "Asynchronous JSON and XHTML", "Automated JavaScript XML"], answer: "Asynchronous JavaScript and XML" },
-        { q: "Which technology allows for full-duplex, real-time communication?", options: ["REST API", "HTTP/1.1", "AJAX polling"], answer: "WebSockets" },
-        { q: "Which object was traditionally used for AJAX before the Fetch API?", options: ["JSONParser", "DOMHttpObject", "WebWorker"], answer: "XMLHttpRequest" },
-        { q: "Which OSI layer ensures error-free transmission between applications?", options: ["Network Layer", "Physical Layer", "Data Link Layer"], answer: "Transport Layer" },
-        { q: "Which server acts as an intermediary for clients seeking resources from other servers?", options: ["Database Server", "Mail Server", "File Server"], answer: "Proxy Server" },
-        { q: "Which format has replaced XML for web APIs?", options: ["HTML", "CSV", "YAML"], answer: "JSON" },
-        { q: "Which header indicates the media type (e.g., application/json)?", options: ["Authorization", "User-Agent", "Accept-Language"], answer: "Content-Type" },
-        { q: "Which environment allows you to run JS outside of a web browser?", options: ["Apache", "Nginx", "Tomcat"], answer: "Node.js" },
-        { q: "Which HTTP method replaces a target resource with uploaded content?", options: ["POST", "PATCH", "GET"], answer: "PUT" },
-        { q: "In a client-server handshake, what initiates the connection?", options: ["The Database", "The Server", "The Router"], answer: "The Client Request" }
+        { q: "What is the primary shift in the role of the IT professional in 2026?", options: ["From hardware mechanics to cloud migrators", "From local networking to global networking", "From security analysts to software engineers"], answer: "From manual \"Builders\" to system \"Governors\"" },
+        { q: "In the context of IT, what is the difference between a \"Skillset\" and a \"Responsibility\"?", options: ["Skillsets belong to the company; responsibilities belong to the employee.", "Skillsets are external duties; responsibilities are internal talents.", "There is no difference; they are used interchangeably."], answer: "Skillsets are internal, portable tools; responsibilities are external organizational duties." },
+        { q: "What occurs during the \"Professional Gap\" when an individual is \"Under-Skilled\"?", options: ["They experience boredom and stagnation.", "They reach the sweet spot of career alignment.", "They are forced to automate their workflow."], answer: "They experience severe stress and burnout." },
+        { q: "According to the 2026 curriculum, which of the following is considered a \"Social Issue\" rather than a \"Professional Issue\"?", options: ["The heavy workload of manual coding.", "Bridging the skill gap in a development team.", "Ensuring a server maintains 99.9% uptime."], answer: "The carbon cost and climate impact of AI data centers." },
+        { q: "What is the \"Analytical Layer\" of the Human Plus Stack?", options: ["Knowing how to write Python and Terraform scripts.", "Possessing strategic empathy and conflict resolution skills.", "Designing autonomous robots for physical tasks."], answer: "Data literacy and knowing when to trust an AI vs. when it is hallucinating." },
+        { q: "How does Dr. Magee define an \"AI Hallucination\"?", options: ["A deliberate lie programmed by a malicious hacker.", "A hardware failure causing distorted screen visuals.", "A database corruption error."], answer: "A statistical mirage where the AI prioritizes plausibility over factual truth." },
+        { q: "Which emerging 2026 role is primarily responsible for managing the soaring costs of cloud computing and AI?", options: ["AI Ethics Lead", "Agentic AI Specialist", "Automation Architect"], answer: "FinOps Analyst" },
+        { q: "What was the main lesson from \"Case Study 001: The Invisible Error\"?", options: ["Professional failures are usually caused by malicious hackers.", "Medical AI should never be used in triage.", "Testers are solely to blame for software bugs."], answer: "Good people making unexamined technical choices often cause systemic issues." },
+        { q: "How does Agentic AI differ from traditional AI?", options: ["It only answers questions using text.", "It requires manual coding for every single task.", "It only generates images and videos."], answer: "It is moving from answering questions to acting on them autonomously." },
+        { q: "Which ethical framework determines the morality of an action solely based on its outcome?", options: ["Deontology", "Virtue Ethics", "Divine Command Theory"], answer: "Utilitarianism" },
+        { q: "Which philosopher is most heavily associated with Deontology?", options: ["Aristotle", "Jeremy Bentham", "John Stuart Mill"], answer: "Immanuel Kant" },
+        { q: "What is the core rule of Kant’s \"Categorical Imperative\"?", options: ["Always choose the lesser of two evils.", "The end justifies the means.", "Find the balance between two extremes."], answer: "Only act according to a rule that you would want to become a universal law." },
+        { q: "According to Virtue Ethics, what is the \"Golden Mean\"?", options: ["The mathematical average of all societal laws.", "The highest possible financial outcome for a company.", "The strict adherence to the Ten Commandments."], answer: "The midpoint between two extremes (e.g., courage is between cowardice and recklessness)." },
+        { q: "Which framework argues that \"When in Rome, do as the Romans do\"?", options: ["Natural Law", "Utilitarianism", "Deontology"], answer: "Moral Relativism" },
+        { q: "Which ethical framework claims that an action is wrong because a higher power forbids it?", options: ["Natural Law", "Virtue Ethics", "Relativism"], answer: "Divine Command Theory" },
+        { q: "Natural Law suggests that morality is based on:", options: ["The consequences of an action.", "Cultural norms and traditions.", "The laws passed by a democratic government."], answer: "An objective moral order built into the fabric of the universe and human purpose." },
+        { q: "In the Trolley Problem, refusing to touch the lever because \"killing is wrong\" regardless of math is:", options: ["Utilitarianism", "Moral Relativism", "Natural Law"], answer: "Deontology" },
+        { q: "What does the \"Mirror Test\" evaluate?", options: ["If the action breaks any laws.", "Who is affected by the consequences.", "How the media will react to the decision."], answer: "Whether you can live with the choice based on your character (Virtue check)." },
+        { q: "How does Dr. Magee redefine whistleblowing in a healthy organization?", options: ["As an act of betrayal against management.", "As a nuclear option meant to destroy a company.", "As a way to gain financial rewards from the government."], answer: "As an early warning system and a high-level act of loyalty to the public." },
+        { q: "Which of the following is NOT one of the three pillars of whistleblowing?", options: ["Uphold Ethical Standards", "Report the Duty", "Support Transparency"], answer: "Ensure Maximum Profitability" },
+        { q: "Why is \"Resilience\" particularly important in moral courage?", options: ["It allows a coder to work 24 hours straight.", "It guarantees a promotion after whistleblowing.", "It prevents hackers from accessing the system."], answer: "It is the mental endurance to stand by your findings despite isolation or pressure from management." },
+        { q: "How should a Filipino IT professional view the concept of \"Pakikisama\" in ethics?", options: ["By remaining silent to protect a coworker's mistakes.", "By ignoring corporate policy to help a friend.", "By gossiping about the issue to force management's hand."], answer: "By viewing integrity as the ultimate form of protecting colleagues and the public from system failure." },
+        { q: "Failure to report a data breach within what timeframe is a criminal offense under RA 10173?", options: ["24 hours", "48 hours", "1 week"], answer: "72 hours" },
+        { q: "What is the primary method for proving digital evidence has not been tampered with?", options: ["Saving it as a PDF.", "Sending it via an encrypted email.", "Printing a hard copy."], answer: "Using a cryptographic hash (like SHA-256) to establish a chain of custody." },
+        { q: "When communicating a technical problem to stakeholders, what is the best strategy?", options: ["Use complex jargon so they don't interfere.", "Tell them the code is messy and needs to be rewritten.", "Threaten to go to the press immediately."], answer: "Translate the issue into business language, such as \"Technical Debt increases security risk.\"" },
+        { q: "What is the purpose of using encrypted volumes (like BitLocker) for whistleblowing?", options: ["To compress the files to save space.", "To make the files load faster.", "To automatically send them to the government."], answer: "To ensure even the company's database administrators cannot read the evidence." },
+        { q: "Which Philippine law primarily protects witnesses from retaliation?", options: ["RA 10173", "RA 3019", "RA 8888"], answer: "RA 6981" },
+        { q: "If medical AI fails to diagnose patients from certain demographics due to limited data, it is:", options: ["Historical Bias", "Cognitive Bias", "Feedback Loop"], answer: "Representation Bias" },
+        { q: "An algorithm penalizing female applicants because they weren't promoted in the past is:", options: ["Representation Bias", "Cognitive Bias", "Selection Bias"], answer: "Historical Bias" },
+        { q: "Conducting a survey exclusively via smartphone app excluding the elderly is:", options: ["Historical Bias", "Cognitive Bias", "Adversarial Bias"], answer: "Selection Bias" },
+        { q: "Subconsciously labeling men as 'doctors' and women as 'nurses' in image datasets injects:", options: ["Representation Bias", "Selection Bias", "Pre-processing Bias"], answer: "Cognitive Bias" },
+        { q: "What makes a \"Feedback Loop\" the most dangerous cause of algorithmic bias?", options: ["It deletes the original training data.", "It causes the server to overheat.", "It violates the EU AI Act automatically."], answer: "The AI's biased predictions cause real-world actions that generate new data, which \"confirms\" and amplifies the original bias." },
+        { q: "Which technique involves adding diverse examples from underrepresented groups to a dataset?", options: ["Resampling", "Feature Selection", "Adversarial Training"], answer: "Data Augmentation" },
+        { q: "What is \"Resampling\" in the context of mitigating bias?", options: ["Deleting the entire dataset.", "Changing the code from Python to C++.", "Asking users to retake a survey."], answer: "Over-sampling minority groups or under-sampling dominant ones to balance the data." },
+        { q: "Excluding zip codes that act as a hidden proxy for race is an example of:", options: ["Data Augmentation", "Counterfactuals", "Cognitive Bias"], answer: "Feature Selection" },
+        { q: "Changing only an applicant's gender to see if an AI decision changes is using:", options: ["Resampling", "Normalization", "Data Provenance"], answer: "Counterfactual Examples" },
+        { q: "What is the primary risk difference between Generative and Agentic AI?", options: ["Generative AI is more expensive.", "Generative takes physical actions, Agentic only text.", "There is no difference."], answer: "Generative AI creates content, while Agentic AI takes autonomous actions in the real world, leading to tangible harm." },
+        { q: "Agentic AI exhibiting behavior the developer never programmed is called:", options: ["Self-awareness", "Deterministic Error", "System Crash"], answer: "Emergent Behavior" },
+        { q: "In the \"Human-in-the-Loop\" (HITL) framework:", options: ["The AI operates entirely on its own.", "The human only intervenes if an error occurs.", "The AI only monitors the human."], answer: "The AI requires human approval before taking every single action." },
+        { q: "What is the primary risk of \"Human-on-the-Loop\" (HOTL)?", options: ["It is too slow.", "It requires too many employees.", "It violates the Data Privacy Act."], answer: "Automation Bias, where humans trust the machine so much they stop paying attention until it's too late." },
+        { q: "Why does traditional accountability fail when autonomous agents cause harm?", options: ["AI is legally a person.", "The user is always 100% to blame.", "The government assumes all liability."], answer: "Because accountability is now distributed across a complex chain of developers, manufacturers, and operators." },
+        { q: "Transparency through Decision Logs is called:", options: ["The Black Box approach", "Differential Privacy", "The Turing Test"], answer: "The Glass Box approach (Explainable AI / XAI)" },
+        { q: "Why is static regulation insufficient for Agentic AI?", options: ["Governments don't understand tech.", "AI companies refuse to follow laws.", "Paper checklists are bad for the environment."], answer: "Because agents learn and evolve, requiring Dynamic Governance frameworks that adjust guardrails in real-time." },
+        { q: "Using technical kill switches and ethics boards as multiple safety nets is:", options: ["Paying off regulators.", "Only encrypting data three times.", "Using three different AI models."], answer: "Using technical kill switches, internal ethics boards, and global standards as multiple safety nets." },
+        { q: "What is the difference between Data Privacy and Data Sovereignty?", options: ["Privacy applies to passwords; Sovereignty to photos.", "Sovereignty is American; Privacy is European.", "They are the exact same concept."], answer: "Privacy is about individual rights; Sovereignty asserts data is subject to the laws of the nation where it is physically stored." },
+        { q: "What is the post-GDPR reality in 2026?", options: ["Every country uses GDPR.", "There are no data laws left.", "All data is controlled by the UN."], answer: "A fractured global landscape with a patchwork of unique, national regulations." },
+        { q: "The 2026 California DELETE Act allows consumers to:", options: ["Delete the internet history of any user.", "Delete AI models permanently.", "Opt out of paying taxes on digital goods."], answer: "Submit a single request that forces all registered data brokers to delete their records." },
+        { q: "If a browser sends a Global Privacy Control (GPC) signal, a website must:", options: ["Ask to accept cookies anyway.", "Ignore it if outside California.", "Block the user from the site."], answer: "Automatically recognize and honor the \"Do Not Track\" signal legally and technically." },
+        { q: "Satisfying GDPR for data collection AND the EU AI Act for output is called:", options: ["Two-factor Authentication", "Mirror Storage", "Dual Key Encryption"], answer: "Double Lock System" },
+        { q: "Under the EU AI Act, Facial Image Scraping from the internet or CCTV is:", options: ["Allowed if on social media.", "Allowed if you pay a fee.", "Allowed for marketing purposes."], answer: "Completely prohibited to untargetedly scrape facial images to build databases." },
+        { q: "The 'Consent Paradox' means:", options: ["Users want free AI but no data use.", "Companies must ask, but users don't read.", "AI can't understand consent forms."], answer: "Just because a user posts a photo publicly does NOT mean they consent to it becoming a permanent part of an AI model." },
+        { q: "Adding mathematical noise so individual records can't be isolated is:", options: ["Homomorphic Encryption", "Data Minimization", "Machine Unlearning"], answer: "Differential Privacy" },
+        { q: "Maintaining a Bill of Materials for data origin and consent is:", options: ["Selling data to advertisers.", "Making AI run faster.", "Treating data as a physical product."], answer: "To prove the origin, consent, and lineage of every byte of data used in training." },
+        { q: "Walking gait or rhythm is an example of:", options: ["Fingerprint", "Iris pattern", "Subdermal vein structure"], answer: "Behavioral Biometric" },
+        { q: "Modern Gate Analysis identifies individuals by:", options: ["Photo of their face.", "Tracking their MAC address.", "Scanning their retina."], answer: "Extracting a kinetic signature from their underlying skeletal rhythm." },
+        { q: "People self-censoring behavior due to biometric surveillance is the:", options: ["Overheating Effect.", "Security Effect.", "Freezing Effect."], answer: "Chilling Effect" },
+        { q: "Hackers intercepting brain signals to decode thoughts is:", options: ["Neural Scrying.", "Mind Mapping.", "Digital Telepathy."], answer: "Neuro-fishing" },
+        { q: "Why is the \"Right to be Forgotten\" hard to apply to biometrics?", options: ["Databases are too small.", "Passwords are harder to delete.", "Governments ban deletions."], answer: "You cannot change your face or brain waves if they are leaked, and it's nearly impossible to \"untrain\" an AI model." },
+        { q: "Comparing hashes without decrypting data back into a face uses:", options: ["Differential Privacy", "Synthetic Data", "Liveness Detection"], answer: "Homomorphic Encryption" },
+        { q: "Processing biometric data entirely on a personal device is:", options: ["Cloud Biometrics.", "Perimeter Biometrics.", "Zero Biometrics."], answer: "Edge Biometrics" }
     ];
 
     function shuffle(array) {
@@ -114,6 +113,7 @@
         return array;
     }
 
+    // Set up questions with random sequence and locked user choices
     const shuffledQuestions = shuffle([...questions]).map(q => ({
         ...q,
         shuffledOptions: shuffle([...q.options, q.answer]),
@@ -136,11 +136,14 @@
         data.shuffledOptions.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
+            
+            // If already answered, lock buttons and show colors
             if (data.userSelection) {
                 btn.disabled = true;
                 if (opt === data.answer) btn.classList.add('correct');
                 else if (opt === data.userSelection) btn.classList.add('wrong');
             }
+            
             btn.innerText = opt;
             btn.onclick = () => checkAnswer(opt, btn);
             optionsDiv.appendChild(btn);
@@ -151,7 +154,7 @@
         const data = shuffledQuestions[currentIdx];
         data.userSelection = selected;
         if (selected === data.answer) score++;
-        loadQuestion();
+        loadQuestion(); // Refresh UI to show correct/wrong
     }
 
     function nextQuestion() {
@@ -163,7 +166,7 @@
                 <div style="text-align:center">
                     <h2>Quiz Complete!</h2>
                     <p style="font-size:2rem">Score: ${score} / ${shuffledQuestions.length}</p>
-                    <button class="btn next-btn" onclick="location.reload()">Restart</button>
+                    <button class="btn next-btn" onclick="location.reload()">Restart Quiz</button>
                 </div>`;
         }
     }
