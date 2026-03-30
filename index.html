@@ -16,6 +16,7 @@
             --accent-4: #f59e0b; /* Orange */
             --accent-5: #ec4899; /* Pink */
             --accent-6: #06b6d4; /* Cyan */
+            --modal-overlay: rgba(0, 0, 0, 0.8);
         }
 
         body {
@@ -71,6 +72,7 @@
             border: 1px solid #334155;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .subject-card::before {
@@ -105,6 +107,71 @@
             color: var(--text-muted);
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--modal-overlay);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #475569;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal h2 { margin-bottom: 20px; color: var(--text-main); }
+
+        .version-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: var(--bg);
+            color: var(--text-main);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .version-btn:hover {
+            background: #334155;
+            border-color: var(--accent-1);
+        }
+
+        .version-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 4px;
+            font-weight: normal;
+        }
+
+        .close-modal {
+            margin-top: 15px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+        }
+
         /* Specific Card Accents */
         .card-cc326 { --accent-color: var(--accent-1); }
         .card-ias321 { --accent-color: var(--accent-6); }
@@ -113,6 +180,11 @@
         .card-itelect4 { --accent-color: var(--accent-5); }
         .card-itprof4 { --accent-color: var(--accent-3); }
 
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .modal { padding: 20px; }
+            .header h1 { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
@@ -148,20 +220,56 @@
             <div class="subtitle">AVAILABLE NA!</div>
         </a>
 
-        <a href="SP321.html" class="subject-card card-sp321">
+        <div onclick="openModal('SP321')" class="subject-card card-sp321">
             <div class="icon">⚙️</div>
             <div class="title">SP 321</div>
-            <div class="subtitle">AVAILABLE NA!!
-            </div>
-        </a>
+            <div class="subtitle">AVAILABLE NA!!</div>
+        </div>
 
-        <a href="ITELECTV4.html" class="subject-card card-itelect4">
+        <div onclick="openModal('ITELECTV4')" class="subject-card card-itelect4">
             <div class="icon">⚡</div>
             <div class="title">IT ELECTV 4</div>
             <div class="subtitle">available</div>
-        </a>
+        </div>
 
     </div>
 
+    <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2 id="modalTitle">Select Version</h2>
+            <a href="#" id="v1Link" class="version-btn">Version 1</a>
+            <a href="#" id="v2Link" class="version-btn">
+                Version 2
+                <span class="version-desc">new version</span>
+            </a>
+            <div class="close-modal" onclick="closeModal()">Close</div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(subject) {
+            const overlay = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const v1 = document.getElementById('v1Link');
+            const v2 = document.getElementById('v2Link');
+
+            title.innerText = subject + " Reviewer";
+            
+            // Set links based on subject
+            if(subject === 'SP321') {
+                v1.href = "SP321.html";
+                v2.href = "sp321v2.html";
+            } else {
+                v1.href = "ITELECTV4.html";
+                v2.href = "ITELECTV4_v2.html";
+            }
+
+            overlay.style.display = 'flex';
+        }
+
+        function closeModal(e) {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
